@@ -1,0 +1,134 @@
+body {
+  min-width: 230px;
+  max-width: 550px;
+  margin: 0 auto;
+  background-color: aliceblue;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+}
+
+header > h1 {
+  color: skyblue;
+  font-size: 80px;
+}
+
+.new-todo {
+  padding: 16px 16px 16px 60px;
+  border: none;
+  background: white;
+  box-shadow: inset 0 -2px 1px rgb(0 0 0 / 3%);
+  font-size: 20px;
+  outline: none;
+  width: 90%;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+}
+
+li div {
+  position: relative;
+}
+
+li.editing div {
+  display: none;
+}
+
+li.editing .edit {
+  margin-left: 43px;
+  padding: 16px 16px 16px 16px;
+  border: 1px solid lightgray;
+  background: white;
+  box-shadow: inset 0 -2px 1px rgb(0 0 0 / 3%);
+  font-size: 20px;
+  outline: none;
+  width: 495px;
+}
+
+li label {
+  width: 90%;
+  word-break: break-all;
+  padding: 16px 16px 16px 60px;
+  display: block;
+  line-height: 1.2;
+  transition: color 0.4s;
+  font-size: 20px;
+  background-color: white;
+  border-bottom: 1px solid #efeeee;
+}
+
+li.completed label {
+  color: #d9d9d9;
+  text-decoration: line-through;
+}
+
+.toggle-all {
+  width: 1px;
+  height: 1px;
+  border: none;
+  opacity: 0.8;
+  position: absolute;
+  top: -55px;
+  left: 0px;
+  bottom: 0px;
+}
+
+.toggle-all + label {
+  width: 60px;
+  height: 20px;
+  margin-top: 15px;
+  font-size: 0;
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+.toggle-all + label:before {
+  content: "❯";
+  font-size: 22px;
+  color: rgb(146, 143, 143);
+  padding: 10px 27px 10px 27px;
+}
+
+.toggle-all:checked + label:before {
+  color: #0b0b0b;
+}
+
+.complete-check {
+  text-align: center;
+  width: 30px;
+  height: auto;
+  position: absolute;
+  margin-left: 10px;
+  top: 0;
+  bottom: 0;
+  border: none;
+}
+
+.distroy {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  height: 30px;
+  margin: auto 0px;
+  font-size: 20px;
+  color: #cc9a9a;
+  background-color: transparent;
+  border: 0;
+  transition: color 0.2s ease-out;
+}
+
+.distroy:hover {
+  color: #af5b5e;
+}
+
+.todo-list {
+  position: relative;
+}

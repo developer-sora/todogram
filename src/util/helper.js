@@ -1,3 +1,10 @@
+export function init(saveItem) {
+  this.saveItem = saveItem;
+}
+
+export function save(key, item) {
+  this.saveItem.save(key, item);
+}
 export function localSave(key, value) {
   return localStorage.setItem(key, JSON.stringify(value));
 }

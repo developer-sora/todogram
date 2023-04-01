@@ -6,8 +6,14 @@ import View from "./view.js";
 
 export const App = {
   init() {
-    this.storage = new Store("todoList");
-    this.model = new Model(this.storage);
+    // template method design pattern
+
+    // TemplateMethod
+    //   .Controler(Model(Store('todoList')), View(Template())).showAll();
+
+    // 전역변수로 쓰는 이유가 있는가?
+    const storage = new Store("todoList");
+    this.model = new Model(storage);
     this.template = new Template();
     this.view = new View(this.template);
     this.controller = new Controller(this.model, this.view);

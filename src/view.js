@@ -87,6 +87,7 @@ View.prototype.render = function (viewCmd, parameter) {
   viewCommands[viewCmd]();
 };
 
+// 이벤트 위임을 위해서는 어떻게 해야 할까?
 View.prototype.bind = function (event, handler) {
   if (event === "addItem") {
     this.$newTodo.addEventListener("keyup", (e) => {

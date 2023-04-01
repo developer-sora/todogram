@@ -1,11 +1,14 @@
-import { localRead, localSave } from "./util/helper.js";
+// localstorage => indexedDB 저장 방식을 바꾼다면 어떻게 해야 할까?
+import { localRead, localSave, init } from "./util/helper.js";
 
 export default function Store(name) {
   this.dbName = name;
   if (!localRead(name)) {
-    const todos = [];
+    const todos = []; // map, set
     localSave(name, todos);
   }
+
+  // init(indexedDB);
 }
 
 Store.prototype.readAll = function () {

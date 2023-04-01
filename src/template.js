@@ -1,4 +1,5 @@
 export default function Template() {
+  // `` 변환하시오.
   this.defaultTemplate =
     '<li data-id="{{id}}" class="{{completed}}">' +
     '<div class="view">' +

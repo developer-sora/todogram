@@ -1,14 +1,20 @@
 export default function Controller(model, view) {
   const self = this;
-  self.model = model;
-  self.view = view;
+  this.model = model;
+  this.view = view;
   self.view.render("showMain");
-  self.view.bind("addItem", function (title) {
+
+  //this bind...
+
+  self.view.bind("addItem", (title) => {
+    // 유효성 체크 ?
     self.addItem(title);
   });
-  self.view.bind("deleteItem", function (id) {
-    self.deleteItem(id);
-  });
+  this.view
+    .bind("deleteItem", function (id) {
+      this.deleteItem(id);
+    })
+    .bind(this);
   self.view.bind("toggleItem", function (updateData) {
     self.toggleItem(updateData);
   });

@@ -2,6 +2,9 @@ export default function Model(storage) {
   this.storage = storage;
 }
 
+// 데이터 스키마 구조를 만들어보자.
+// id, title, completed
+
 Model.prototype.read = function (id) {
   if (id) {
     return this.storage.readItem(id);

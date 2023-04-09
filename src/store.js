@@ -1,4 +1,4 @@
-import { localRead, localSave } from "./util/helper.js";
+import { localRead, localSave } from './util/helper.js';
 
 export default function Store(name) {
   this.dbName = name;
@@ -12,9 +12,14 @@ Store.prototype.readAll = function () {
   return localRead(this.dbName);
 };
 
-Store.prototype.readItem = function (id) {
+Store.prototype.readItem = function (query) {
   const todos = this.readAll(this.dbName);
-  const findTodoItem = todos.filter((v) => v.id === Number(id));
+  const findTodoItem = todos.filter(v => {
+    for (const q in query) {
+      if (v[q] !== query[q]) return false;
+    }
+    return true;
+  });
   return findTodoItem;
 };
 
@@ -26,15 +31,20 @@ Store.prototype.newItemSave = function (updateData) {
 
 Store.prototype.deleteItemSave = function (id) {
   const todos = this.readAll(this.dbName);
-  const deletedTodos = todos.filter((v) => v.id !== id);
+  const deletedTodos = todos.filter(v => v.id !== id);
   localSave(this.dbName, deletedTodos);
+};
+
+Store.prototype.dropItemsSave = function () {
+  const todos = [];
+  localSave(this.dbName, todos);
 };
 
 Store.prototype.updateItemSave = function (id, updateData) {
   const todos = this.readAll(this.dbName);
-  const index = todos.findIndex((v) => v.id === id);
-  for (let key in updateData) {
-    todos[index][key] = updateData[key];
+  const index = todos.findIndex(v => v.id === id);
+  for (const key in updateData) {
+    if (Object.prototype.hasOwnProperty.call(updateData, key)) todos[index][key] = updateData[key];
   }
   localSave(this.dbName, todos);
 };

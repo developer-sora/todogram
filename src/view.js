@@ -1,10 +1,16 @@
-import { findParent } from "./util/helper.js";
+import { findParent } from './util/helper.js';
+import showTemplate from './util/template.js';
 
-export default function View(template) {
-  this.template = template;
-  this.$date = document.querySelector(".date");
-  this.$todoList = document.querySelector(".todo-list");
-  this.$newTodo = document.querySelector(".new-todo");
+export default function View() {
+  this.showTemplate = showTemplate;
+  this.$date = document.querySelector('.date');
+  this.$todoList = document.querySelector('.todo-list');
+  this.$newTodo = document.querySelector('.new-todo');
+  this.$activeView = document.querySelector('.view-todo-count');
+  this.$completedView = document.querySelector('.view-done-count');
+  this.$activeCounter = document.querySelector('.todo-count');
+  this.$completedCounter = document.querySelector('.done-count');
+  this.$allDestroy = document.querySelector('.all-destroy');
 }
 
 // 화살표 함수와 function() 차이점 공부
@@ -17,7 +23,7 @@ View.prototype.getDate = function () {
 };
 
 View.prototype._itemId = function (element) {
-  const $li = findParent(element, "li");
+  const $li = findParent(element, 'li');
   return parseInt($li.dataset.id, 10);
 };
 
@@ -31,9 +37,9 @@ View.prototype.deleteItem = function (id) {
 View.prototype.toggleItem = function (id, completed) {
   const elem = document.querySelector('[data-id="' + id + '"]');
   if (elem) {
-    elem.classList.toggle("completed");
+    elem.classList.toggle('completed');
   }
-  elem.querySelector("input").checked = completed;
+  elem.querySelector('input').checked = completed;
 };
 
 View.prototype.editItem = function (id, title) {
@@ -41,9 +47,9 @@ View.prototype.editItem = function (id, title) {
   if (!elem) {
     return;
   }
-  elem.classList.add("editing");
-  const input = document.createElement("input");
-  input.className = "edit";
+  elem.classList.add('editing');
+  const input = document.createElement('input');
+  input.className = 'edit';
   elem.appendChild(input);
   input.focus();
   input.value = title;
@@ -54,10 +60,10 @@ View.prototype.editItemDone = function (id, title) {
   if (!elem) {
     return;
   }
-  elem.classList.remove("editing");
-  const input = elem.querySelector(".edit");
+  elem.classList.remove('editing');
+  const input = elem.querySelector('.edit');
   elem.removeChild(input);
-  elem.querySelector("label").textContent = title;
+  elem.querySelector('label').textContent = title;
 };
 
 View.prototype.render = function (viewCmd, parameter) {
@@ -66,10 +72,10 @@ View.prototype.render = function (viewCmd, parameter) {
       this.$date.innerHTML = this.getDate();
     },
     showEntries: () => {
-      this.$todoList.innerHTML = this.template.show(parameter);
+      this.$todoList.innerHTML = this.showTemplate(parameter);
     },
     addItem: () => {
-      this.$newTodo.value = "";
+      this.$newTodo.value = '';
     },
     deleteItem: () => {
       this.deleteItem(parameter);
@@ -83,28 +89,47 @@ View.prototype.render = function (viewCmd, parameter) {
     editItemDone: () => {
       this.editItemDone(parameter.id, parameter.title);
     },
+    updateElementCount: () => {
+      this.$activeCounter.innerHTML = parameter.active;
+      this.$completedCounter.innerHTML = parameter.completed;
+    },
   };
   viewCommands[viewCmd]();
 };
 
 View.prototype.bind = function (event, handler) {
-  if (event === "addItem") {
-    this.$newTodo.addEventListener("keyup", (e) => {
-      if (e.target.value !== "" && e.key === "Enter") {
+  if (event === 'showActive') {
+    this.$activeView.addEventListener('click', () => {
+      handler();
+    });
+  }
+  if (event === 'showCompleted') {
+    this.$completedView.addEventListener('click', () => {
+      handler();
+    });
+  }
+  if (event === 'addItem') {
+    this.$newTodo.addEventListener('keyup', e => {
+      if (e.target.value !== '' && e.key === 'Enter') {
         handler(this.$newTodo.value);
       }
     });
   }
-  if (event === "deleteItem") {
-    this.$todoList.addEventListener("click", (e) => {
-      if (e.target.className === "destroy") {
+  if (event === 'deleteItem') {
+    this.$todoList.addEventListener('click', e => {
+      if (e.target.className === 'destroy') {
         handler(this._itemId(e.target));
       }
     });
   }
-  if (event === "toggleItem") {
-    this.$todoList.addEventListener("click", (e) => {
-      if (e.target.className === "toggle") {
+  if (event === 'dropItems') {
+    this.$allDestroy.addEventListener('click', () => {
+      // handler();
+    });
+  }
+  if (event === 'toggleItem') {
+    this.$todoList.addEventListener('click', e => {
+      if (e.target.className === 'toggle') {
         handler({
           id: this._itemId(e.target),
           completed: e.target.checked,
@@ -112,18 +137,18 @@ View.prototype.bind = function (event, handler) {
       }
     });
   }
-  if (event === "editItem") {
-    this.$todoList.addEventListener("dblclick", (e) => {
-      if (e.target.className === "list_elem") {
+  if (event === 'editItem') {
+    this.$todoList.addEventListener('dblclick', e => {
+      if (e.target.className === 'list_elem') {
         handler(this._itemId(e.target));
       }
     });
   }
-  if (event === "editItemDone") {
+  if (event === 'editItemDone') {
     this.$todoList.addEventListener(
-      "blur",
-      (e) => {
-        if (e.target.className === "edit") {
+      'blur',
+      e => {
+        if (e.target.className === 'edit') {
           handler({
             id: this._itemId(e.target),
             title: e.target.value,
@@ -132,8 +157,8 @@ View.prototype.bind = function (event, handler) {
       },
       true
     );
-    this.$todoList.addEventListener("keypress", (e) => {
-      if (e.target.className === "edit" && e.key === "Enter") {
+    this.$todoList.addEventListener('keypress', e => {
+      if (e.target.className === 'edit' && e.key === 'Enter') {
         e.target.blur();
       }
     });

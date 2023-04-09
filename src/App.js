@@ -1,16 +1,12 @@
-import Store from "./store.js";
-import Model from "./model.js";
-import Template from "./template.js";
-import Controller from "./controller.js";
-import View from "./view.js";
+import Store from './store.js';
+import Model from './model.js';
+import Controller from './controller.js';
+import View from './view.js';
 
-export const App = {
-  init() {
-    this.storage = new Store("todoList");
-    this.model = new Model(this.storage);
-    this.template = new Template();
-    this.view = new View(this.template);
-    this.controller = new Controller(this.model, this.view);
-    this.controller.showAll();
-  },
-};
+export default function App() {
+  const storage = new Store('todoList');
+  const model = new Model(storage);
+  const view = new View();
+  const controller = new Controller(model, view);
+  controller.showAll();
+}

@@ -22,8 +22,8 @@ Model.prototype.delete = function (id) {
   this.storage.deleteItemSave(id);
 };
 
-Model.prototype.drop = function () {
-  this.storage.dropItemsSave();
+Model.prototype.drop = function (currentPage) {
+  this.storage.dropItemsSave(currentPage);
 };
 
 Model.prototype.update = function (id, updateData) {

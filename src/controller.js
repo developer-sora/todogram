@@ -1,37 +1,40 @@
 export default function Controller(model, view) {
-  const self = this;
-  self.model = model;
-  self.view = view;
-  self.view.render('showMain');
-  self.view.bind('addItem', title => {
-    self.addItem(title);
+  this.model = model;
+  this.view = view;
+  this.view.render('showMain');
+  this.view.bind('addItem', title => {
+    this.addItem(title);
   });
-  self.view.bind('deleteItem', id => {
-    self.deleteItem(id);
+  this.view.bind('deleteItem', id => {
+    this.deleteItem(id);
   });
-  self.view.bind('toggleItem', updateData => {
-    self.toggleItem(updateData);
+  this.view.bind('toggleItem', updateData => {
+    this.toggleItem(updateData);
   });
-  self.view.bind('editItem', id => {
-    self.editItem(id);
+  this.view.bind('editItem', id => {
+    this.editItem(id);
   });
-  self.view.bind('editItemDone', updateData => {
-    self.editItemSave(updateData);
+  this.view.bind('editItemDone', updateData => {
+    this.editItemSave(updateData);
   });
-  self.view.bind('showActive', () => {
-    self.showActive();
+  this.view.bind('showActive', () => {
+    this.showActive();
   });
-  self.view.bind('showCompleted', () => {
-    self.showCompleted();
+  this.view.bind('showCompleted', () => {
+    this.showCompleted();
   });
-  self.view.bind('dropItems', () => {
-    self.dropItems();
+  this.view.bind('dropItems', () => {
+    this.dropItems();
   });
 }
 
+Controller.prototype.setView = function (locationHash = '') {
+  const route = locationHash.split('/')[1];
+  this.updateFilterState(route);
+};
+
 Controller.prototype.showAll = function () {
   const data = this.model.read();
-  this.updateCount();
   this.view.render('showEntries', data);
 };
 
@@ -48,7 +51,7 @@ Controller.prototype.showCompleted = function () {
 Controller.prototype.addItem = function (title) {
   this.model.create(title);
   this.view.render('addItem');
-  this.showAll();
+  this.filter();
 };
 
 Controller.prototype.deleteItem = function (id) {
@@ -58,8 +61,8 @@ Controller.prototype.deleteItem = function (id) {
 };
 
 Controller.prototype.dropItems = function () {
-  this.model.drop();
-  this.showAll();
+  this.model.drop(this.activeRoute);
+  this.filter();
 };
 
 Controller.prototype.toggleItem = function (updateData) {
@@ -90,10 +93,20 @@ Controller.prototype.updateCount = function () {
   });
 };
 
+Controller.prototype.filter = function () {
+  this.updateCount();
+  this['show' + this.activeRoute]();
+};
+
+Controller.prototype.updateFilterState = function (currentPage = 'All') {
+  const activeRouter = currentPage.charAt(0).toUpperCase() + currentPage.substring(1);
+  this.activeRoute = activeRouter;
+  this.filter();
+};
 /*
-self.model.create(title, function () {
-			self.view.render('clearNewTodo');
-			self._filter(true);
+this.model.create(title, function () {
+			this.view.render('clearNewTodo');
+			this._filter(true);
 		});
 
     model안에 view.render를 넘기는 이유?

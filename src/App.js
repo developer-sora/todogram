@@ -4,9 +4,8 @@ import Controller from './controller.js';
 import View from './view.js';
 
 export default function App() {
-  const storage = new Store('todoList');
-  const model = new Model(storage);
-  const view = new View();
-  const controller = new Controller(model, view);
-  controller.showAll();
+  this.storage = new Store('todoList');
+  this.model = new Model(this.storage);
+  this.view = new View();
+  this.controller = new Controller(this.model, this.view);
 }

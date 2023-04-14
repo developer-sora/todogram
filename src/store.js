@@ -35,9 +35,16 @@ Store.prototype.deleteItemSave = function (id) {
   localSave(this.dbName, deletedTodos);
 };
 
-Store.prototype.dropItemsSave = function () {
-  const todos = [];
-  localSave(this.dbName, todos);
+Store.prototype.dropItemsSave = function (currentPage) {
+  if (currentPage === 'All') {
+    const todos = [];
+    localSave(this.dbName, todos);
+  } else {
+    const todos = this.readAll(this.dbName);
+    const state = currentPage !== 'Active';
+    const deletedTodos = todos.filter(v => v.completed !== state);
+    localSave(this.dbName, deletedTodos);
+  }
 };
 
 Store.prototype.updateItemSave = function (id, updateData) {

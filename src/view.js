@@ -124,7 +124,7 @@ View.prototype.bind = function (event, handler) {
   }
   if (event === 'dropItems') {
     this.$allDestroy.addEventListener('click', () => {
-      // handler();
+      handler();
     });
   }
   if (event === 'toggleItem') {

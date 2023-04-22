@@ -1,12 +1,12 @@
 export default function Controller(model, view) {
   this.model = model;
   this.view = view;
-  this.view.render('showMain');
+  this.view.render('showDate');
   this.view.bind('turnDarkMode', () => {
     this.turnDarkMode();
   });
-  this.view.bind('addItemDoing', status => {
-    this.addItemDoing(status);
+  this.view.bind('controlPostButton', status => {
+    this.controlPostButton(status);
   });
   this.view.bind('addItemDone', title => {
     this.addItem(title);
@@ -17,8 +17,8 @@ export default function Controller(model, view) {
   this.view.bind('toggleItem', updateData => {
     this.toggleItem(updateData);
   });
-  this.view.bind('toggleAll', completedAll => {
-    this.toggleAll(completedAll);
+  this.view.bind('toggleAll', completed => {
+    this.toggleAll(completed);
   });
   this.view.bind('editItem', id => {
     this.editItem(id);
@@ -67,17 +67,14 @@ Controller.prototype.showCompleted = function () {
   this.view.render('showEntries', data);
 };
 
-Controller.prototype.addItemDoing = function (status) {
-  if (status === 'writing') {
-    this.view.render('addItemDoing');
-  } else {
-    this.view.render('addItemDone');
-  }
+Controller.prototype.controlPostButton = function (status) {
+  this.view.render(status + 'PostButton');
 };
 
 Controller.prototype.addItem = function (title) {
   this.model.create(title);
   this.view.render('addItemDone');
+  this.view.render('disablePostButton');
   this.filter(true);
 };
 
@@ -116,9 +113,9 @@ Controller.prototype.toggleItem = function (updateData) {
   this.filter();
 };
 
-Controller.prototype.toggleAll = function (completedAll) {
-  this.model.toggleAll(completedAll);
-  this.view.render('toggleAll');
+Controller.prototype.toggleAll = function (completed) {
+  this.model.toggleAll(completed);
+  this.view.render('toggleAll', completed);
   this.filter();
 };
 
@@ -140,8 +137,8 @@ Controller.prototype.editItemSave = function (updateData) {
 Controller.prototype.updateCount = function () {
   this.model.getCount(todos => {
     this.view.render('updateElementCount', todos);
-    this.view.render('allCompleted', { allCompleted: todos.total !== 0 && todos.total === todos.completed });
-    if (todos.total === 0 && this.activeRoute === 'All') {
+    this.view.render('toggleAll', { completed: todos.total !== 0 && todos.total === todos.completed });
+    if (this.activeRoute === 'All' && (todos.total === 0 || todos.total === todos.completed || todos.completed === 0)) {
       this.showAll();
     }
   });
@@ -160,11 +157,3 @@ Controller.prototype.updateFilterState = function (currentPage = 'All') {
   this.activeRoute = activeRouter;
   this.filter();
 };
-/*
-this.model.create(title, function () {
-			this.view.render('clearNewTodo');
-			this._filter(true);
-		});
-
-    model안에 view.render를 넘기는 이유?
- */

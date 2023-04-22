@@ -40,10 +40,34 @@ __webpack_require__(/*! regenerator-runtime/runtime */ "./node_modules/regenerat
 
 /***/ }),
 
-/***/ "./src/app.js":
-/*!********************!*\
-  !*** ./src/app.js ***!
-  \********************/
+/***/ "./src/constant/textData.js":
+/*!**********************************!*\
+  !*** ./src/constant/textData.js ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "MODAL_TEXT": () => (/* binding */ MODAL_TEXT),
+/* harmony export */   "NO_DATA_TEXT": () => (/* binding */ NO_DATA_TEXT)
+/* harmony export */ });
+var NO_DATA_TEXT = {
+  "default": '투두리스트를 작성해보세요 ✨',
+  completed: '완료한 투두리스트가 없어요 💦'
+};
+var MODAL_TEXT = {
+  all: '전부 삭제할까요?',
+  active: '완료되지 않은 항목을 전부 삭제할까요?',
+  completed: '완료된 항목을 전부 삭제할까요?'
+};
+
+/***/ }),
+
+/***/ "./src/js/app.js":
+/*!***********************!*\
+  !*** ./src/js/app.js ***!
+  \***********************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -51,10 +75,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ App)
 /* harmony export */ });
-/* harmony import */ var _store_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./store.js */ "./src/store.js");
-/* harmony import */ var _model_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./model.js */ "./src/model.js");
-/* harmony import */ var _controller_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./controller.js */ "./src/controller.js");
-/* harmony import */ var _view_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./view.js */ "./src/view.js");
+/* harmony import */ var _store_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./store.js */ "./src/js/store.js");
+/* harmony import */ var _model_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./model.js */ "./src/js/model.js");
+/* harmony import */ var _controller_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./controller.js */ "./src/js/controller.js");
+/* harmony import */ var _view_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./view.js */ "./src/js/view.js");
 
 
 
@@ -68,10 +92,10 @@ function App() {
 
 /***/ }),
 
-/***/ "./src/controller.js":
-/*!***************************!*\
-  !*** ./src/controller.js ***!
-  \***************************/
+/***/ "./src/js/controller.js":
+/*!******************************!*\
+  !*** ./src/js/controller.js ***!
+  \******************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -84,7 +108,13 @@ function Controller(model, view) {
   this.model = model;
   this.view = view;
   this.view.render('showMain');
-  this.view.bind('addItem', function (title) {
+  this.view.bind('turnDarkMode', function () {
+    _this.turnDarkMode();
+  });
+  this.view.bind('addItemDoing', function (status) {
+    _this.addItemDoing(status);
+  });
+  this.view.bind('addItemDone', function (title) {
     _this.addItem(title);
   });
   this.view.bind('deleteItem', function (id) {
@@ -93,19 +123,28 @@ function Controller(model, view) {
   this.view.bind('toggleItem', function (updateData) {
     _this.toggleItem(updateData);
   });
+  this.view.bind('toggleAll', function (completedAll) {
+    _this.toggleAll(completedAll);
+  });
   this.view.bind('editItem', function (id) {
     _this.editItem(id);
+  });
+  this.view.bind('openEditMenu', function (id) {
+    _this.openEditMenu(id);
+  });
+  this.view.bind('closeEditMenu', function () {
+    _this.closeEditMenu();
   });
   this.view.bind('editItemDone', function (updateData) {
     _this.editItemSave(updateData);
   });
-  this.view.bind('showActive', function () {
-    _this.showActive();
+  this.view.bind('openDropModal', function () {
+    _this.openDropModal();
   });
-  this.view.bind('showCompleted', function () {
-    _this.showCompleted();
+  this.view.bind('closeDropModal', function () {
+    _this.closeDropModal();
   });
-  this.view.bind('dropItems', function () {
+  this.view.bind('dropItemsDone', function () {
     _this.dropItems();
   });
 }
@@ -113,6 +152,9 @@ Controller.prototype.setView = function () {
   var locationHash = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
   var route = locationHash.split('/')[1];
   this.updateFilterState(route);
+};
+Controller.prototype.turnDarkMode = function () {
+  this.view.render('darkMode');
 };
 Controller.prototype.showAll = function () {
   var data = this.model.read();
@@ -130,18 +172,38 @@ Controller.prototype.showCompleted = function () {
   });
   this.view.render('showEntries', data);
 };
+Controller.prototype.addItemDoing = function (status) {
+  if (status === 'writing') {
+    this.view.render('addItemDoing');
+  } else {
+    this.view.render('addItemDone');
+  }
+};
 Controller.prototype.addItem = function (title) {
   this.model.create(title);
-  this.view.render('addItem');
-  this.filter();
+  this.view.render('addItemDone');
+  this.filter(true);
+};
+Controller.prototype.openEditMenu = function (id) {
+  this.view.render('openEditMenu', id);
+};
+Controller.prototype.closeEditMenu = function () {
+  this.view.render('closeEditMenu');
 };
 Controller.prototype.deleteItem = function (id) {
   this.model["delete"](id);
-  this.updateCount();
   this.view.render('deleteItem', id);
+  this.filter();
+};
+Controller.prototype.openDropModal = function () {
+  this.view.render('openDropModal');
+};
+Controller.prototype.closeDropModal = function () {
+  this.view.render('closeDropModal');
 };
 Controller.prototype.dropItems = function () {
   this.model.drop(this.activeRoute);
+  this.view.render('closeDropModal');
   this.filter();
 };
 Controller.prototype.toggleItem = function (updateData) {
@@ -151,7 +213,12 @@ Controller.prototype.toggleItem = function (updateData) {
     completed: completed
   });
   this.view.render('toggleItem', updateData);
-  this.updateCount();
+  this.filter();
+};
+Controller.prototype.toggleAll = function (completedAll) {
+  this.model.toggleAll(completedAll);
+  this.view.render('toggleAll');
+  this.filter();
 };
 Controller.prototype.editItem = function (id) {
   var data = this.model.read({
@@ -178,11 +245,20 @@ Controller.prototype.updateCount = function () {
   var _this2 = this;
   this.model.getCount(function (todos) {
     _this2.view.render('updateElementCount', todos);
+    _this2.view.render('allCompleted', {
+      allCompleted: todos.total !== 0 && todos.total === todos.completed
+    });
+    if (todos.total === 0 && _this2.activeRoute === 'All') {
+      _this2.showAll();
+    }
   });
 };
-Controller.prototype.filter = function () {
+Controller.prototype.filter = function (force) {
   this.updateCount();
-  this['show' + this.activeRoute]();
+  if (force || this.lastActiveRoute !== 'All' || this.lastActiveRoute !== this.activeRoute) {
+    this['show' + this.activeRoute]();
+  }
+  this.lastActiveRoute = this.activeRoute;
 };
 Controller.prototype.updateFilterState = function () {
   var currentPage = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'All';
@@ -201,10 +277,10 @@ this.model.create(title, function () {
 
 /***/ }),
 
-/***/ "./src/model.js":
-/*!**********************!*\
-  !*** ./src/model.js ***!
-  \**********************/
+/***/ "./src/js/model.js":
+/*!*************************!*\
+  !*** ./src/js/model.js ***!
+  \*************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -238,8 +314,12 @@ Model.prototype.drop = function (currentPage) {
 Model.prototype.update = function (id, updateData) {
   this.storage.updateItemSave(id, updateData);
 };
+Model.prototype.toggleAll = function (completedAll) {
+  this.storage.toggleAllSave(completedAll);
+};
 Model.prototype.getCount = function (callback) {
   var todos = {
+    total: 0,
     active: 0,
     completed: 0
   };
@@ -248,16 +328,18 @@ Model.prototype.getCount = function (callback) {
     if (todo.completed) {
       todos.completed++;
     } else todos.active++;
+    todos.total++;
   });
   callback(todos);
+  return todos;
 };
 
 /***/ }),
 
-/***/ "./src/store.js":
-/*!**********************!*\
-  !*** ./src/store.js ***!
-  \**********************/
+/***/ "./src/js/store.js":
+/*!*************************!*\
+  !*** ./src/js/store.js ***!
+  \*************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -265,7 +347,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Store)
 /* harmony export */ });
-/* harmony import */ var _util_helper_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util/helper.js */ "./src/util/helper.js");
+/* harmony import */ var _util_helper_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/helper.js */ "./src/util/helper.js");
 
 function Store(name) {
   this.dbName = name;
@@ -322,6 +404,288 @@ Store.prototype.updateItemSave = function (id, updateData) {
   }
   (0,_util_helper_js__WEBPACK_IMPORTED_MODULE_0__.localSave)(this.dbName, todos);
 };
+Store.prototype.toggleAllSave = function (completedAll) {
+  var todos = this.readAll(this.dbName);
+  for (var i = 0; i < todos.length; i++) {
+    todos[i].completed = completedAll;
+  }
+  (0,_util_helper_js__WEBPACK_IMPORTED_MODULE_0__.localSave)(this.dbName, todos);
+};
+
+/***/ }),
+
+/***/ "./src/js/view.js":
+/*!************************!*\
+  !*** ./src/js/view.js ***!
+  \************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ View)
+/* harmony export */ });
+/* harmony import */ var _util_helper_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/helper.js */ "./src/util/helper.js");
+/* harmony import */ var _util_template_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/template.js */ "./src/util/template.js");
+
+
+function View() {
+  this.showTemplate = _util_template_js__WEBPACK_IMPORTED_MODULE_1__["default"];
+  this.$darkMode = document.querySelector('#dark-mode-toggle');
+  this.$date = document.querySelector('.date');
+  this.$todoList = document.querySelector('#todo-list');
+  this.$toggleAll = document.querySelector('#toggle-all');
+  this.$newTodo = document.querySelector('.new-todo');
+  this.$activeCounter = document.querySelector('.todo-count');
+  this.$completedCounter = document.querySelector('.done-count');
+  this.$allDestroy = document.querySelector('.all-destroy');
+  this.$modal = document.querySelector('.modal');
+  this.$post = document.querySelector('#post');
+}
+
+// 화살표 함수와 function() 차이점 공부
+
+View.prototype.getDate = function () {
+  var now = new Date();
+  return "\n  ".concat(now.getFullYear(), ".").concat(now.getMonth() + 1, ".").concat(now.getDate(), " \n  ");
+};
+View.prototype._itemId = function (element) {
+  var $li = (0,_util_helper_js__WEBPACK_IMPORTED_MODULE_0__.findParent)(element, 'li');
+  return parseInt($li.dataset.id, 10);
+};
+View.prototype.deleteItem = function (id) {
+  var elem = document.querySelector('[data-id="' + id + '"]');
+  if (elem) {
+    this.$todoList.removeChild(elem);
+  }
+};
+View.prototype.toggleItem = function (id, completed) {
+  var elem = document.querySelector('[data-id="' + id + '"]');
+  if (elem) {
+    elem.querySelector('input').checked = completed;
+  }
+};
+View.prototype.allCompleted = function (allCompleted) {
+  this.$toggleAll.checked = allCompleted;
+};
+View.prototype.toggleAll = function () {
+  var completedAll = this.$toggleAll.checked;
+  var elem = document.querySelectorAll('#toggle');
+  if (elem) {
+    elem.forEach(function (_, idx) {
+      elem[idx].checked = completedAll;
+    });
+  }
+};
+View.prototype.editItem = function (id, title) {
+  var elem = document.querySelector('[data-id="' + id + '"]');
+  if (!elem) {
+    return;
+  }
+  var div = elem.querySelector('div');
+  div.classList.add('hidden');
+  var input = document.createElement('input');
+  input.id = 'edit';
+  input.className = 'w-full border-b outline-none pl-10 pb-1 pt-2 mb-1';
+  elem.appendChild(input);
+  input.focus();
+  input.value = title;
+};
+View.prototype.openEditMenu = function (id) {
+  var elem = document.querySelector('[data-id="' + id + '"]');
+  if (elem) {
+    elem.querySelector('ul').classList.remove('hidden');
+  }
+};
+View.prototype.closeEditMenu = function () {
+  var elem = document.querySelector('#editMenu');
+  if (elem) {
+    elem.parentNode.removeChild(elem);
+  }
+};
+View.prototype.editItemDone = function (id, title) {
+  var elem = document.querySelector('[data-id="' + id + '"]');
+  if (!elem) {
+    return;
+  }
+  var div = elem.querySelector('div');
+  div.classList.remove('hidden');
+  var input = elem.querySelector('#edit');
+  elem.removeChild(input);
+  elem.querySelector('label').textContent = title;
+};
+View.prototype.controlPostButton = function () {
+  var elem = document.querySelector('#post');
+  elem.classList.add('hover:text-blue-700');
+};
+View.prototype.render = function (viewCmd, parameter) {
+  var _this = this;
+  var viewCommands = {
+    darkMode: function darkMode() {
+      document.documentElement.classList.toggle('dark');
+    },
+    showMain: function showMain() {
+      _this.$date.innerHTML = _this.getDate();
+    },
+    showEntries: function showEntries() {
+      _this.$todoList.innerHTML = _this.showTemplate(parameter);
+      if (parameter.length === 0) {
+        _this.$allDestroy.disabled = true;
+      } else {
+        _this.$allDestroy.disabled = false;
+      }
+    },
+    addItemDoing: function addItemDoing() {
+      _this.$post.disabled = false;
+      _this.$post.classList.remove('opacity-30');
+    },
+    addItemDone: function addItemDone() {
+      _this.$newTodo.value = '';
+      _this.$post.disabled = true;
+      _this.$post.classList.add('opacity-30');
+    },
+    openEditMenu: function openEditMenu() {
+      _this.openEditMenu(parameter);
+    },
+    closeEditMenu: function closeEditMenu() {
+      _this.closeEditMenu();
+    },
+    openDropModal: function openDropModal() {
+      _this.$modal.innerHTML = (0,_util_template_js__WEBPACK_IMPORTED_MODULE_1__["default"])('modal');
+    },
+    closeDropModal: function closeDropModal() {
+      _this.$modal.innerHTML = '';
+    },
+    deleteItem: function deleteItem() {
+      _this.deleteItem(parameter);
+    },
+    toggleItem: function toggleItem() {
+      _this.toggleItem(parameter.id, parameter.completed);
+    },
+    toggleAll: function toggleAll() {
+      _this.toggleAll();
+    },
+    allCompleted: function allCompleted() {
+      _this.allCompleted(parameter.allCompleted);
+    },
+    editItem: function editItem() {
+      _this.editItem(parameter.id, parameter.title);
+    },
+    editItemDone: function editItemDone() {
+      _this.editItemDone(parameter.id, parameter.title);
+    },
+    updateElementCount: function updateElementCount() {
+      _this.$activeCounter.innerHTML = parameter.active;
+      _this.$completedCounter.innerHTML = parameter.completed;
+    }
+  };
+  viewCommands[viewCmd]();
+};
+View.prototype.bind = function (event, handler) {
+  var _this2 = this;
+  if (event === 'turnDarkMode') {
+    this.$darkMode.addEventListener('click', function () {
+      handler();
+    });
+  }
+  if (event === 'addItemDoing') {
+    this.$newTodo.addEventListener('keyup', function (e) {
+      if (e.target.value !== '') {
+        handler('writing');
+      } else {
+        handler('noText');
+      }
+    });
+  }
+  if (event === 'addItemDone') {
+    this.$newTodo.addEventListener('keyup', function (e) {
+      if (e.target.value !== '' && e.key === 'Enter') {
+        handler(_this2.$newTodo.value);
+      }
+    });
+    this.$post.addEventListener('click', function () {
+      handler(_this2.$newTodo.value);
+    });
+  }
+  if (event === 'openEditMenu') {
+    this.$todoList.addEventListener('click', function (e) {
+      if (e.target.classList.contains('editButton')) {
+        handler(_this2._itemId(e.target));
+      }
+    });
+  }
+  if (event === 'closeEditMenu') {
+    document.addEventListener('click', function (e) {
+      if (e.target.classList.contains('opened')) {
+        console.log('123');
+      }
+    });
+  }
+  if (event === 'openDropModal') {
+    this.$allDestroy.addEventListener('click', function () {
+      handler();
+    });
+  }
+  if (event === 'closeDropModal') {
+    document.addEventListener('click', function (e) {
+      if (e.target.id === 'modalBackground') handler();
+    });
+    this.$modal.addEventListener('click', function (e) {
+      if (e.target.id === 'exit' || e.target.id === 'cancel') {
+        handler();
+      }
+    });
+  }
+  if (event === 'dropItemsDone') {
+    this.$modal.addEventListener('click', function (e) {
+      if (e.target.id === 'delete') {
+        handler();
+      }
+    });
+  }
+  if (event === 'toggleItem') {
+    this.$todoList.addEventListener('click', function (e) {
+      if (e.target.className.split(' ')[0] === 'toggle') {
+        handler({
+          id: _this2._itemId(e.target),
+          completed: e.target.checked
+        });
+      }
+    });
+  }
+  if (event === 'toggleAll') {
+    this.$toggleAll.addEventListener('click', function (e) {
+      if (e.target.id === 'toggle-all') {
+        handler(e.target.checked);
+      }
+    });
+  }
+  if (event === 'editItem') {
+    this.$todoList.addEventListener('dblclick', function (e) {
+      if (e.target.className.includes('list_elem')) {
+        handler(_this2._itemId(e.target));
+      }
+    });
+  }
+  if (event === 'editItemDone') {
+    this.$todoList.addEventListener('blur', function (e) {
+      if (e.target.id === 'edit') {
+        handler({
+          id: _this2._itemId(e.target),
+          title: e.target.value
+        });
+      }
+    }, true);
+    this.$todoList.addEventListener('keypress', function (e) {
+      if (e.target.id === 'edit' && e.key === 'Enter') {
+        e.target.blur();
+      }
+    });
+  }
+};
+
+// blur에 true넣는 이유??
+// 이벤트 캡쳐링..
 
 /***/ }),
 
@@ -367,189 +731,34 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ showTemplate)
 /* harmony export */ });
+/* harmony import */ var _constant_textData_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constant/textData.js */ "./src/constant/textData.js");
+
+var dropModalTemplate = function dropModalTemplate(status) {
+  return "\n    <div\n      id=\"modalBackground\"\n      class=\"flex justify-center items-center fixed top-0 left-0 w-full h-full backdrop-blur-sm backdrop-brightness-[.8]\">\n      <div class=\"min-w-[290px] w-auto h-42 bg-white rounded-xl relative dark:bg-slate-600 dark:text-slate-100\">\n        <button id=\"exit\" class=\"cursor-pointer w-6 h-6 text-xl font-semibold absolute right-0 mr-3 mt-2\">x</button>\n        <div class=\"pt-12 pb-7 px-6 text-center break-all\">".concat(_constant_textData_js__WEBPACK_IMPORTED_MODULE_0__.MODAL_TEXT[status], "</div>\n        <hr />\n        <div class=\"flex\">\n          <button id=\"cancel\" class=\"w-1/2 h-12\">\uCDE8\uC18C</button>\n          <div class=\"border-l\"></div>\n          <button id=\"delete\" class=\"w-1/2 text-red-500\">\uC0AD\uC81C</button>\n        </div>\n      </div>\n    </div>\n");
+};
+var noDataTemplate = function noDataTemplate(status) {
+  return "\n  <div class=\"m-auto text-center py-7 text-stone-500 dark:text-slate-300\">".concat(_constant_textData_js__WEBPACK_IMPORTED_MODULE_0__.NO_DATA_TEXT[status], "</div>\n");
+};
 var template = function template(data) {
-  return "<li data-id=\"".concat(data.id, "\" class=\"").concat(data.completed ? 'completed' : '', "\">\n    <div class=\"view\">\n    <input class=\"toggle\" type=\"checkbox\" ").concat(data.completed ? 'checked' : '', ">\n    <label class=\"list_elem\">").concat(data.title, "</label>\n    <button class=\"destroy\"></button>\n    </div>\n    </li>");
+  return "<li data-id=\"".concat(data.id, "\" class=\"px-3 relative\">\n    <div class=\"view relative flex\">\n    <input id=\"toggle\" class=\"toggle checked:border w-8 border-none appearance-none absolute inset-y-0 cursor-pointer peer/input\" type=\"checkbox\" ").concat(data.completed ? 'checked' : '', ">\n    <label class=\"list_elem w-full pl-10 my-2 bg-22 bg-no-repeat \n    transition \n    peer-checked/input:bg-heart-fill\n    peer-checked/input:text-gray-300\n    peer-checked/input:line-through\n    bg-heart-border\n    bg-left    \n    list_elem block \n    break-all\n    peer/text\n    dark:bg-heart-border-white\n    dark:text-slate-100\n    peer-checked/input:dark:bg-heart-fill-purple\n    peer-checked/input:dark:text-slate-400\n    \">\n    ").concat(data.title, "\n    </label>\n    <button class=\"editButton m-auto cursor-pointer w-6 h-8 text-2xl absolute right-0 inset-y-0 bg-19 bg-no-repeat bg-center bg-icon-editMenu dark:invert\">\n    </button>\n    </div>\n    <ul class=\"editMenu absolute top-0 right-[35px] w-20 h-20 ml-20 rounded-xl bg-white border text-sm dark:bg-slate-700 z-10 hidden\">\n      <li class=\"border-b h-1/2 flex items-center justify-center cursor-pointer\">\uC218\uC815</li>\n      <li class=\"h-1/2 flex items-center justify-center cursor-pointer\">\uC0AD\uC81C</li>\n    </ul>\n    </li>");
 };
 function showTemplate(data) {
+  if (data === 'modal') {
+    var currentPage = document.location.hash;
+    var status = currentPage.includes('completed') ? 'completed' : currentPage.includes('active') ? 'active' : 'all';
+    return dropModalTemplate(status);
+  }
+  if (data.length === 0) {
+    var _currentPage = document.location.hash;
+    var _status = _currentPage.includes('completed') ? 'completed' : 'default';
+    return noDataTemplate(_status);
+  }
   var view = '';
   data.forEach(function (value) {
     view += template(value);
   });
   return view;
 }
-
-/***/ }),
-
-/***/ "./src/view.js":
-/*!*********************!*\
-  !*** ./src/view.js ***!
-  \*********************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ View)
-/* harmony export */ });
-/* harmony import */ var _util_helper_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util/helper.js */ "./src/util/helper.js");
-/* harmony import */ var _util_template_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./util/template.js */ "./src/util/template.js");
-
-
-function View() {
-  this.showTemplate = _util_template_js__WEBPACK_IMPORTED_MODULE_1__["default"];
-  this.$date = document.querySelector('.date');
-  this.$todoList = document.querySelector('.todo-list');
-  this.$newTodo = document.querySelector('.new-todo');
-  this.$activeView = document.querySelector('.view-todo-count');
-  this.$completedView = document.querySelector('.view-done-count');
-  this.$activeCounter = document.querySelector('.todo-count');
-  this.$completedCounter = document.querySelector('.done-count');
-  this.$allDestroy = document.querySelector('.all-destroy');
-}
-
-// 화살표 함수와 function() 차이점 공부
-
-View.prototype.getDate = function () {
-  var now = new Date();
-  return "\n  ".concat(now.getFullYear(), ".").concat(now.getMonth() + 1, ".").concat(now.getDate(), " \n  ");
-};
-View.prototype._itemId = function (element) {
-  var $li = (0,_util_helper_js__WEBPACK_IMPORTED_MODULE_0__.findParent)(element, 'li');
-  return parseInt($li.dataset.id, 10);
-};
-View.prototype.deleteItem = function (id) {
-  var elem = document.querySelector('[data-id="' + id + '"]');
-  if (elem) {
-    this.$todoList.removeChild(elem);
-  }
-};
-View.prototype.toggleItem = function (id, completed) {
-  var elem = document.querySelector('[data-id="' + id + '"]');
-  if (elem) {
-    elem.classList.toggle('completed');
-  }
-  elem.querySelector('input').checked = completed;
-};
-View.prototype.editItem = function (id, title) {
-  var elem = document.querySelector('[data-id="' + id + '"]');
-  if (!elem) {
-    return;
-  }
-  elem.classList.add('editing');
-  var input = document.createElement('input');
-  input.className = 'edit';
-  elem.appendChild(input);
-  input.focus();
-  input.value = title;
-};
-View.prototype.editItemDone = function (id, title) {
-  var elem = document.querySelector('[data-id="' + id + '"]');
-  if (!elem) {
-    return;
-  }
-  elem.classList.remove('editing');
-  var input = elem.querySelector('.edit');
-  elem.removeChild(input);
-  elem.querySelector('label').textContent = title;
-};
-View.prototype.render = function (viewCmd, parameter) {
-  var _this = this;
-  var viewCommands = {
-    showMain: function showMain() {
-      _this.$date.innerHTML = _this.getDate();
-    },
-    showEntries: function showEntries() {
-      _this.$todoList.innerHTML = _this.showTemplate(parameter);
-    },
-    addItem: function addItem() {
-      _this.$newTodo.value = '';
-    },
-    deleteItem: function deleteItem() {
-      _this.deleteItem(parameter);
-    },
-    toggleItem: function toggleItem() {
-      _this.toggleItem(parameter.id, parameter.completed);
-    },
-    editItem: function editItem() {
-      _this.editItem(parameter.id, parameter.title);
-    },
-    editItemDone: function editItemDone() {
-      _this.editItemDone(parameter.id, parameter.title);
-    },
-    updateElementCount: function updateElementCount() {
-      _this.$activeCounter.innerHTML = parameter.active;
-      _this.$completedCounter.innerHTML = parameter.completed;
-    }
-  };
-  viewCommands[viewCmd]();
-};
-View.prototype.bind = function (event, handler) {
-  var _this2 = this;
-  if (event === 'showActive') {
-    this.$activeView.addEventListener('click', function () {
-      handler();
-    });
-  }
-  if (event === 'showCompleted') {
-    this.$completedView.addEventListener('click', function () {
-      handler();
-    });
-  }
-  if (event === 'addItem') {
-    this.$newTodo.addEventListener('keyup', function (e) {
-      if (e.target.value !== '' && e.key === 'Enter') {
-        handler(_this2.$newTodo.value);
-      }
-    });
-  }
-  if (event === 'deleteItem') {
-    this.$todoList.addEventListener('click', function (e) {
-      if (e.target.className === 'destroy') {
-        handler(_this2._itemId(e.target));
-      }
-    });
-  }
-  if (event === 'dropItems') {
-    this.$allDestroy.addEventListener('click', function () {
-      handler();
-    });
-  }
-  if (event === 'toggleItem') {
-    this.$todoList.addEventListener('click', function (e) {
-      if (e.target.className === 'toggle') {
-        handler({
-          id: _this2._itemId(e.target),
-          completed: e.target.checked
-        });
-      }
-    });
-  }
-  if (event === 'editItem') {
-    this.$todoList.addEventListener('dblclick', function (e) {
-      if (e.target.className === 'list_elem') {
-        handler(_this2._itemId(e.target));
-      }
-    });
-  }
-  if (event === 'editItemDone') {
-    this.$todoList.addEventListener('blur', function (e) {
-      if (e.target.className === 'edit') {
-        handler({
-          id: _this2._itemId(e.target),
-          title: e.target.value
-        });
-      }
-    }, true);
-    this.$todoList.addEventListener('keypress', function (e) {
-      if (e.target.className === 'edit' && e.key === 'Enter') {
-        e.target.blur();
-      }
-    });
-  }
-};
-
-// blur에 true넣는 이유??
-// 이벤트 캡쳐링..
 
 /***/ }),
 
@@ -10461,11 +10670,11 @@ _global["default"]._babelPolyfill = true;
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
-/*!**********************!*\
-  !*** ./src/index.js ***!
-  \**********************/
+/*!*************************!*\
+  !*** ./src/js/index.js ***!
+  \*************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _app_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./app.js */ "./src/app.js");
+/* harmony import */ var _app_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./app.js */ "./src/js/app.js");
 
 var todo = new _app_js__WEBPACK_IMPORTED_MODULE_0__["default"]();
 function setView() {

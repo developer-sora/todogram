@@ -12,30 +12,29 @@ Store.prototype.readAll = function () {
   return localRead(this.dbName);
 };
 
-Store.prototype.readItem = function (query) {
+Store.prototype.read = function (query) {
   const todos = this.readAll(this.dbName);
-  const findTodoItem = todos.filter(v => {
+  return todos.filter(v => {
     for (const q in query) {
       if (v[q] !== query[q]) return false;
     }
     return true;
   });
-  return findTodoItem;
 };
 
-Store.prototype.newItemSave = function (updateData) {
+Store.prototype.add = function (updateData) {
   const todos = this.readAll(this.dbName);
   todos.push(updateData);
   localSave(this.dbName, todos);
 };
 
-Store.prototype.deleteItemSave = function (id) {
+Store.prototype.delete = function (id) {
   const todos = this.readAll(this.dbName);
   const deletedTodos = todos.filter(v => v.id !== id);
   localSave(this.dbName, deletedTodos);
 };
 
-Store.prototype.dropItemsSave = function (currentPage) {
+Store.prototype.drop = function (currentPage) {
   if (currentPage === 'All') {
     const todos = [];
     localSave(this.dbName, todos);
@@ -47,7 +46,7 @@ Store.prototype.dropItemsSave = function (currentPage) {
   }
 };
 
-Store.prototype.updateItemSave = function (id, updateData) {
+Store.prototype.update = function (id, updateData) {
   const todos = this.readAll(this.dbName);
   const index = todos.findIndex(v => v.id === id);
   for (const key in updateData) {
@@ -56,10 +55,10 @@ Store.prototype.updateItemSave = function (id, updateData) {
   localSave(this.dbName, todos);
 };
 
-Store.prototype.toggleAllSave = function (completedAll) {
+Store.prototype.toggleAll = function (completed) {
   const todos = this.readAll(this.dbName);
   for (let i = 0; i < todos.length; i++) {
-    todos[i].completed = completedAll;
+    todos[i].completed = completed;
   }
   localSave(this.dbName, todos);
 };

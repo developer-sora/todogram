@@ -1,7 +1,6 @@
 {
   "name": "Todos_VanillaJS",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "build": "webpack -w",
@@ -29,6 +28,11 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-html": "^7.1.0",
     "eslint-plugin-import": "^2.27.5",
+    "jasmine": "^4.6.0",
+    "jasmine-core": "^4.6.0",
+    "karma": "^6.4.2",
+    "karma-chrome-launcher": "^3.2.0",
+    "karma-jasmine": "^5.1.0",
     "prettier": "2.8.7",
     "tailwindcss": "^3.3.1",
     "webpack": "^5.79.0",
@@ -36,5 +40,6 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.12.1"
-  }
+  },
+  "description": ""
 }

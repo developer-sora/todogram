@@ -4,34 +4,34 @@ export default function Model(storage) {
 
 Model.prototype.read = function (query) {
   if (query) {
-    return this.storage.readItem(query);
+    return this.storage.read(query);
   }
   return this.storage.readAll();
 };
 
 Model.prototype.create = function (title) {
-  const newTodoList = {
+  const newTodos = {
     title,
     completed: false,
     id: new Date().getTime(),
   };
-  this.storage.newItemSave(newTodoList);
+  this.storage.add(newTodos);
 };
 
 Model.prototype.delete = function (id) {
-  this.storage.deleteItemSave(id);
+  this.storage.delete(id);
 };
 
 Model.prototype.drop = function (currentPage) {
-  this.storage.dropItemsSave(currentPage);
+  this.storage.drop(currentPage);
 };
 
 Model.prototype.update = function (id, updateData) {
-  this.storage.updateItemSave(id, updateData);
+  this.storage.update(id, updateData);
 };
 
-Model.prototype.toggleAll = function (completedAll) {
-  this.storage.toggleAllSave(completedAll);
+Model.prototype.toggleAll = function (completed) {
+  this.storage.toggleAll(completed);
 };
 
 Model.prototype.getCount = function (callback) {

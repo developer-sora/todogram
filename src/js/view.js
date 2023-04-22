@@ -1,21 +1,18 @@
 import { findParent } from '../util/helper.js';
-import showTemplate from '../util/template.js';
 
-export default function View() {
-  this.showTemplate = showTemplate;
+export default function View(template) {
+  this.template = template;
   this.$darkMode = document.querySelector('#dark-mode-toggle');
   this.$date = document.querySelector('.date');
   this.$todoList = document.querySelector('#todo-list');
   this.$toggleAll = document.querySelector('#toggle-all');
   this.$newTodo = document.querySelector('.new-todo');
-  this.$activeCounter = document.querySelector('.todo-count');
-  this.$completedCounter = document.querySelector('.done-count');
+  this.$activeCounter = document.querySelector('.active-count');
+  this.$completedCounter = document.querySelector('.completed-count');
   this.$allDestroy = document.querySelector('.all-destroy');
   this.$modal = document.querySelector('.modal');
   this.$post = document.querySelector('#post');
 }
-
-// 화살표 함수와 function() 차이점 공부
 
 View.prototype.getDate = function () {
   const now = new Date();
@@ -24,7 +21,7 @@ View.prototype.getDate = function () {
   `;
 };
 
-View.prototype._itemId = function (element) {
+View.prototype.getItemId = function (element) {
   const $li = findParent(element, 'li');
   return parseInt($li.dataset.id, 10);
 };
@@ -43,13 +40,9 @@ View.prototype.toggleItem = function (id, completed) {
   }
 };
 
-View.prototype.allCompleted = function (allCompleted) {
-  this.$toggleAll.checked = allCompleted;
-};
-
 View.prototype.toggleAll = function () {
   const completedAll = this.$toggleAll.checked;
-  const elem = document.querySelectorAll('#toggle');
+  const elem = document.querySelectorAll('.toggle');
   if (elem) {
     elem.forEach((_, idx) => {
       elem[idx].checked = completedAll;
@@ -98,35 +91,28 @@ View.prototype.editItemDone = function (id, title) {
   elem.querySelector('label').textContent = title;
 };
 
-View.prototype.controlPostButton = function () {
-  const elem = document.querySelector('#post');
-  elem.classList.add('hover:text-blue-700');
-};
-
 View.prototype.render = function (viewCmd, parameter) {
   const viewCommands = {
     darkMode: () => {
       document.documentElement.classList.toggle('dark');
     },
-    showMain: () => {
+    showDate: () => {
       this.$date.innerHTML = this.getDate();
     },
     showEntries: () => {
-      this.$todoList.innerHTML = this.showTemplate(parameter);
-      if (parameter.length === 0) {
-        this.$allDestroy.disabled = true;
-      } else {
-        this.$allDestroy.disabled = false;
-      }
+      this.$todoList.innerHTML = this.template.showMainTemplate(parameter);
+      this.$allDestroy.disabled = parameter.length === 0;
     },
-    addItemDoing: () => {
+    activePostButton: () => {
       this.$post.disabled = false;
       this.$post.classList.remove('opacity-30');
     },
-    addItemDone: () => {
-      this.$newTodo.value = '';
+    disablePostButton: () => {
       this.$post.disabled = true;
       this.$post.classList.add('opacity-30');
+    },
+    addItemDone: () => {
+      this.$newTodo.value = '';
     },
     openEditMenu: () => {
       this.openEditMenu(parameter);
@@ -135,7 +121,7 @@ View.prototype.render = function (viewCmd, parameter) {
       this.closeEditMenu();
     },
     openDropModal: () => {
-      this.$modal.innerHTML = showTemplate('modal');
+      this.$modal.innerHTML = this.template.showModalTemplate('modal');
     },
     closeDropModal: () => {
       this.$modal.innerHTML = '';
@@ -147,10 +133,7 @@ View.prototype.render = function (viewCmd, parameter) {
       this.toggleItem(parameter.id, parameter.completed);
     },
     toggleAll: () => {
-      this.toggleAll();
-    },
-    allCompleted: () => {
-      this.allCompleted(parameter.allCompleted);
+      this.$toggleAll.checked = parameter.completed;
     },
     editItem: () => {
       this.editItem(parameter.id, parameter.title);
@@ -172,12 +155,12 @@ View.prototype.bind = function (event, handler) {
       handler();
     });
   }
-  if (event === 'addItemDoing') {
+  if (event === 'controlPostButton') {
     this.$newTodo.addEventListener('keyup', e => {
       if (e.target.value !== '') {
-        handler('writing');
+        handler('active');
       } else {
-        handler('noText');
+        handler('disable');
       }
     });
   }
@@ -194,7 +177,7 @@ View.prototype.bind = function (event, handler) {
   if (event === 'openEditMenu') {
     this.$todoList.addEventListener('click', e => {
       if (e.target.classList.contains('editButton')) {
-        handler(this._itemId(e.target));
+        handler(this.getItemId(e.target));
       }
     });
   }
@@ -229,9 +212,9 @@ View.prototype.bind = function (event, handler) {
   }
   if (event === 'toggleItem') {
     this.$todoList.addEventListener('click', e => {
-      if (e.target.className.split(' ')[0] === 'toggle') {
+      if (e.target.classList.contains('toggle')) {
         handler({
-          id: this._itemId(e.target),
+          id: this.getItemId(e.target),
           completed: e.target.checked,
         });
       }
@@ -247,7 +230,7 @@ View.prototype.bind = function (event, handler) {
   if (event === 'editItem') {
     this.$todoList.addEventListener('dblclick', e => {
       if (e.target.className.includes('list_elem')) {
-        handler(this._itemId(e.target));
+        handler(this.getItemId(e.target));
       }
     });
   }
@@ -257,7 +240,7 @@ View.prototype.bind = function (event, handler) {
       e => {
         if (e.target.id === 'edit') {
           handler({
-            id: this._itemId(e.target),
+            id: this.getItemId(e.target),
             title: e.target.value,
           });
         }

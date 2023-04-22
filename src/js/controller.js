@@ -2,7 +2,13 @@ export default function Controller(model, view) {
   this.model = model;
   this.view = view;
   this.view.render('showMain');
-  this.view.bind('addItem', title => {
+  this.view.bind('turnDarkMode', () => {
+    this.turnDarkMode();
+  });
+  this.view.bind('addItemDoing', status => {
+    this.addItemDoing(status);
+  });
+  this.view.bind('addItemDone', title => {
     this.addItem(title);
   });
   this.view.bind('deleteItem', id => {
@@ -11,19 +17,28 @@ export default function Controller(model, view) {
   this.view.bind('toggleItem', updateData => {
     this.toggleItem(updateData);
   });
+  this.view.bind('toggleAll', completedAll => {
+    this.toggleAll(completedAll);
+  });
   this.view.bind('editItem', id => {
     this.editItem(id);
+  });
+  this.view.bind('openEditMenu', id => {
+    this.openEditMenu(id);
+  });
+  this.view.bind('closeEditMenu', () => {
+    this.closeEditMenu();
   });
   this.view.bind('editItemDone', updateData => {
     this.editItemSave(updateData);
   });
-  this.view.bind('showActive', () => {
-    this.showActive();
+  this.view.bind('openDropModal', () => {
+    this.openDropModal();
   });
-  this.view.bind('showCompleted', () => {
-    this.showCompleted();
+  this.view.bind('closeDropModal', () => {
+    this.closeDropModal();
   });
-  this.view.bind('dropItems', () => {
+  this.view.bind('dropItemsDone', () => {
     this.dropItems();
   });
 }
@@ -31,6 +46,10 @@ export default function Controller(model, view) {
 Controller.prototype.setView = function (locationHash = '') {
   const route = locationHash.split('/')[1];
   this.updateFilterState(route);
+};
+
+Controller.prototype.turnDarkMode = function () {
+  this.view.render('darkMode');
 };
 
 Controller.prototype.showAll = function () {
@@ -48,20 +67,45 @@ Controller.prototype.showCompleted = function () {
   this.view.render('showEntries', data);
 };
 
+Controller.prototype.addItemDoing = function (status) {
+  if (status === 'writing') {
+    this.view.render('addItemDoing');
+  } else {
+    this.view.render('addItemDone');
+  }
+};
+
 Controller.prototype.addItem = function (title) {
   this.model.create(title);
-  this.view.render('addItem');
-  this.filter();
+  this.view.render('addItemDone');
+  this.filter(true);
+};
+
+Controller.prototype.openEditMenu = function (id) {
+  this.view.render('openEditMenu', id);
+};
+
+Controller.prototype.closeEditMenu = function () {
+  this.view.render('closeEditMenu');
 };
 
 Controller.prototype.deleteItem = function (id) {
   this.model.delete(id);
-  this.updateCount();
   this.view.render('deleteItem', id);
+  this.filter();
+};
+
+Controller.prototype.openDropModal = function () {
+  this.view.render('openDropModal');
+};
+
+Controller.prototype.closeDropModal = function () {
+  this.view.render('closeDropModal');
 };
 
 Controller.prototype.dropItems = function () {
   this.model.drop(this.activeRoute);
+  this.view.render('closeDropModal');
   this.filter();
 };
 
@@ -69,7 +113,13 @@ Controller.prototype.toggleItem = function (updateData) {
   const { id, completed } = updateData;
   this.model.update(id, { completed });
   this.view.render('toggleItem', updateData);
-  this.updateCount();
+  this.filter();
+};
+
+Controller.prototype.toggleAll = function (completedAll) {
+  this.model.toggleAll(completedAll);
+  this.view.render('toggleAll');
+  this.filter();
 };
 
 Controller.prototype.editItem = function (id) {
@@ -90,12 +140,19 @@ Controller.prototype.editItemSave = function (updateData) {
 Controller.prototype.updateCount = function () {
   this.model.getCount(todos => {
     this.view.render('updateElementCount', todos);
+    this.view.render('allCompleted', { allCompleted: todos.total !== 0 && todos.total === todos.completed });
+    if (todos.total === 0 && this.activeRoute === 'All') {
+      this.showAll();
+    }
   });
 };
 
-Controller.prototype.filter = function () {
+Controller.prototype.filter = function (force) {
   this.updateCount();
-  this['show' + this.activeRoute]();
+  if (force || this.lastActiveRoute !== 'All' || this.lastActiveRoute !== this.activeRoute) {
+    this['show' + this.activeRoute]();
+  }
+  this.lastActiveRoute = this.activeRoute;
 };
 
 Controller.prototype.updateFilterState = function (currentPage = 'All') {

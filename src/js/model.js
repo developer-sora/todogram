@@ -30,8 +30,13 @@ Model.prototype.update = function (id, updateData) {
   this.storage.updateItemSave(id, updateData);
 };
 
+Model.prototype.toggleAll = function (completedAll) {
+  this.storage.toggleAllSave(completedAll);
+};
+
 Model.prototype.getCount = function (callback) {
   const todos = {
+    total: 0,
     active: 0,
     completed: 0,
   };
@@ -42,7 +47,10 @@ Model.prototype.getCount = function (callback) {
     if (todo.completed) {
       todos.completed++;
     } else todos.active++;
+    todos.total++;
   });
 
   callback(todos);
+
+  return todos;
 };

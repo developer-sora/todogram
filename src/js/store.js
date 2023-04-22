@@ -1,4 +1,4 @@
-import { localRead, localSave } from './util/helper.js';
+import { localRead, localSave } from '../util/helper.js';
 
 export default function Store(name) {
   this.dbName = name;
@@ -52,6 +52,14 @@ Store.prototype.updateItemSave = function (id, updateData) {
   const index = todos.findIndex(v => v.id === id);
   for (const key in updateData) {
     if (Object.prototype.hasOwnProperty.call(updateData, key)) todos[index][key] = updateData[key];
+  }
+  localSave(this.dbName, todos);
+};
+
+Store.prototype.toggleAllSave = function (completedAll) {
+  const todos = this.readAll(this.dbName);
+  for (let i = 0; i < todos.length; i++) {
+    todos[i].completed = completedAll;
   }
   localSave(this.dbName, todos);
 };

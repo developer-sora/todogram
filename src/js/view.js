@@ -59,23 +59,30 @@ View.prototype.editItem = function (id, title) {
   div.classList.add('hidden');
   const input = document.createElement('input');
   input.id = 'edit';
-  input.className = 'w-full border-b outline-none pl-10 pb-1 pt-2 mb-1';
+  input.className = 'w-[97%] border-b outline-none pl-8 pb-1 pt-2 mb-1 mr-2';
   elem.appendChild(input);
   input.focus();
   input.value = title;
 };
 
 View.prototype.openEditMenu = function (id) {
+  const $openedUl = document.querySelector('.opened');
+  if ($openedUl) {
+    $openedUl.classList.add('hidden');
+    $openedUl.classList.remove('opened');
+  }
   const elem = document.querySelector('[data-id="' + id + '"]');
   if (elem) {
-    elem.querySelector('ul').classList.remove('hidden');
+    elem.querySelector('ul').classList.toggle('hidden');
+    elem.querySelector('ul').classList.toggle('opened');
   }
 };
 
 View.prototype.closeEditMenu = function () {
-  const elem = document.querySelector('#editMenu');
+  const elem = document.querySelector('.opened');
   if (elem) {
-    elem.parentNode.removeChild(elem);
+    elem.classList.add('hidden');
+    elem.classList.remove('opened');
   }
 };
 
@@ -118,7 +125,7 @@ View.prototype.render = function (viewCmd, parameter) {
       this.openEditMenu(parameter);
     },
     closeEditMenu: () => {
-      this.closeEditMenu();
+      this.closeEditMenu(parameter);
     },
     openDropModal: () => {
       this.$modal.innerHTML = this.template.showModalTemplate('modal');
@@ -183,8 +190,15 @@ View.prototype.bind = function (event, handler) {
   }
   if (event === 'closeEditMenu') {
     document.addEventListener('click', e => {
-      if (e.target.classList.contains('opened')) {
-        console.log('123');
+      if (!e.target.classList.contains('editButton')) {
+        handler();
+      }
+    });
+  }
+  if (event === 'deleteItem') {
+    this.$todoList.addEventListener('click', e => {
+      if (e.target.classList.contains('delete')) {
+        handler(this.getItemId(e.target));
       }
     });
   }
@@ -205,7 +219,7 @@ View.prototype.bind = function (event, handler) {
   }
   if (event === 'dropItemsDone') {
     this.$modal.addEventListener('click', e => {
-      if (e.target.id === 'delete') {
+      if (e.target.id === 'drop') {
         handler();
       }
     });
@@ -229,7 +243,12 @@ View.prototype.bind = function (event, handler) {
   }
   if (event === 'editItem') {
     this.$todoList.addEventListener('dblclick', e => {
-      if (e.target.className.includes('list_elem')) {
+      if (e.target.classList.contains('list_elem')) {
+        handler(this.getItemId(e.target));
+      }
+    });
+    this.$todoList.addEventListener('click', e => {
+      if (e.target.classList.contains('editItem')) {
         handler(this.getItemId(e.target));
       }
     });

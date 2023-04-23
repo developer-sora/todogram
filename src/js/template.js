@@ -19,8 +19,9 @@ export default function Template() {
       <button class="editButton m-auto cursor-pointer w-6 h-8 text-2xl absolute right-0 inset-y-0 bg-19 bg-no-repeat bg-center bg-icon-editMenu dark:invert"></button>
     </div>
     <ul class="editMenu absolute top-0 right-[35px] w-20 h-20 ml-20 rounded-xl bg-white border text-sm dark:bg-slate-700 z-10 hidden">
-      <li class="border-b h-1/2 flex items-center justify-center cursor-pointer">수정</li>
-      <li class="h-1/2 flex items-center justify-center cursor-pointer">삭제</li>
+      <li class="editItem h-1/2 flex items-center justify-center cursor-pointer dark:text-slate-200 hover:opacity-40">수정</li>
+      <hr/>
+      <li class="delete h-1/2 flex items-center justify-center cursor-pointer dark:text-slate-200 hover:opacity-40">삭제</li>
     </ul>
   </li>`;
 
@@ -33,13 +34,13 @@ export default function Template() {
       <div class="flex">
         <button id="cancel" class="w-1/2 h-12">취소</button>
         <div class="border-l"></div>
-        <button id="delete" class="w-1/2 text-red-500">삭제</button>
+        <button id="drop" class="w-1/2 text-red-500">삭제</button>
       </div>
     </div>
   </div>`;
 
   this.noDataTemplate = status => `
-  <div class="m-auto text-center py-7 text-stone-500 dark:text-slate-300">${NO_DATA_TEXT[status]}</div>
+  <div class="text-center mt-20 h-full text-stone-500 dark:text-slate-300">${NO_DATA_TEXT[status]}</div>
   `;
 }
 

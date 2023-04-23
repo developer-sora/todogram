@@ -79,6 +79,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _model_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./model.js */ "./src/js/model.js");
 /* harmony import */ var _controller_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./controller.js */ "./src/js/controller.js");
 /* harmony import */ var _view_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./view.js */ "./src/js/view.js");
+/* harmony import */ var _template_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./template.js */ "./src/js/template.js");
+
 
 
 
@@ -86,7 +88,8 @@ __webpack_require__.r(__webpack_exports__);
 function App() {
   this.storage = new _store_js__WEBPACK_IMPORTED_MODULE_0__["default"]('todoList');
   this.model = new _model_js__WEBPACK_IMPORTED_MODULE_1__["default"](this.storage);
-  this.view = new _view_js__WEBPACK_IMPORTED_MODULE_3__["default"]();
+  this.template = new _template_js__WEBPACK_IMPORTED_MODULE_4__["default"]();
+  this.view = new _view_js__WEBPACK_IMPORTED_MODULE_3__["default"](this.template);
   this.controller = new _controller_js__WEBPACK_IMPORTED_MODULE_2__["default"](this.model, this.view);
 }
 
@@ -107,12 +110,12 @@ function Controller(model, view) {
   var _this = this;
   this.model = model;
   this.view = view;
-  this.view.render('showMain');
+  this.view.render('showDate');
   this.view.bind('turnDarkMode', function () {
     _this.turnDarkMode();
   });
-  this.view.bind('addItemDoing', function (status) {
-    _this.addItemDoing(status);
+  this.view.bind('controlPostButton', function (status) {
+    _this.controlPostButton(status);
   });
   this.view.bind('addItemDone', function (title) {
     _this.addItem(title);
@@ -123,8 +126,8 @@ function Controller(model, view) {
   this.view.bind('toggleItem', function (updateData) {
     _this.toggleItem(updateData);
   });
-  this.view.bind('toggleAll', function (completedAll) {
-    _this.toggleAll(completedAll);
+  this.view.bind('toggleAll', function (completed) {
+    _this.toggleAll(completed);
   });
   this.view.bind('editItem', function (id) {
     _this.editItem(id);
@@ -172,16 +175,13 @@ Controller.prototype.showCompleted = function () {
   });
   this.view.render('showEntries', data);
 };
-Controller.prototype.addItemDoing = function (status) {
-  if (status === 'writing') {
-    this.view.render('addItemDoing');
-  } else {
-    this.view.render('addItemDone');
-  }
+Controller.prototype.controlPostButton = function (status) {
+  this.view.render(status + 'PostButton');
 };
 Controller.prototype.addItem = function (title) {
   this.model.create(title);
   this.view.render('addItemDone');
+  this.view.render('disablePostButton');
   this.filter(true);
 };
 Controller.prototype.openEditMenu = function (id) {
@@ -215,9 +215,9 @@ Controller.prototype.toggleItem = function (updateData) {
   this.view.render('toggleItem', updateData);
   this.filter();
 };
-Controller.prototype.toggleAll = function (completedAll) {
-  this.model.toggleAll(completedAll);
-  this.view.render('toggleAll');
+Controller.prototype.toggleAll = function (completed) {
+  this.model.toggleAll(completed);
+  this.view.render('toggleAll', completed);
   this.filter();
 };
 Controller.prototype.editItem = function (id) {
@@ -245,10 +245,10 @@ Controller.prototype.updateCount = function () {
   var _this2 = this;
   this.model.getCount(function (todos) {
     _this2.view.render('updateElementCount', todos);
-    _this2.view.render('allCompleted', {
-      allCompleted: todos.total !== 0 && todos.total === todos.completed
+    _this2.view.render('toggleAll', {
+      completed: todos.total !== 0 && todos.total === todos.completed
     });
-    if (todos.total === 0 && _this2.activeRoute === 'All') {
+    if (_this2.activeRoute === 'All' && (todos.total === 0 || todos.total === todos.completed || todos.completed === 0)) {
       _this2.showAll();
     }
   });
@@ -266,14 +266,6 @@ Controller.prototype.updateFilterState = function () {
   this.activeRoute = activeRouter;
   this.filter();
 };
-/*
-this.model.create(title, function () {
-			this.view.render('clearNewTodo');
-			this._filter(true);
-		});
-
-    model안에 view.render를 넘기는 이유?
- */
 
 /***/ }),
 
@@ -293,29 +285,29 @@ function Model(storage) {
 }
 Model.prototype.read = function (query) {
   if (query) {
-    return this.storage.readItem(query);
+    return this.storage.read(query);
   }
   return this.storage.readAll();
 };
 Model.prototype.create = function (title) {
-  var newTodoList = {
+  var newTodos = {
     title: title,
     completed: false,
     id: new Date().getTime()
   };
-  this.storage.newItemSave(newTodoList);
+  this.storage.add(newTodos);
 };
 Model.prototype["delete"] = function (id) {
-  this.storage.deleteItemSave(id);
+  this.storage["delete"](id);
 };
 Model.prototype.drop = function (currentPage) {
-  this.storage.dropItemsSave(currentPage);
+  this.storage.drop(currentPage);
 };
 Model.prototype.update = function (id, updateData) {
-  this.storage.updateItemSave(id, updateData);
+  this.storage.update(id, updateData);
 };
-Model.prototype.toggleAll = function (completedAll) {
-  this.storage.toggleAllSave(completedAll);
+Model.prototype.toggleAll = function (completed) {
+  this.storage.toggleAll(completed);
 };
 Model.prototype.getCount = function (callback) {
   var todos = {
@@ -359,29 +351,28 @@ function Store(name) {
 Store.prototype.readAll = function () {
   return (0,_util_helper_js__WEBPACK_IMPORTED_MODULE_0__.localRead)(this.dbName);
 };
-Store.prototype.readItem = function (query) {
+Store.prototype.read = function (query) {
   var todos = this.readAll(this.dbName);
-  var findTodoItem = todos.filter(function (v) {
+  return todos.filter(function (v) {
     for (var q in query) {
       if (v[q] !== query[q]) return false;
     }
     return true;
   });
-  return findTodoItem;
 };
-Store.prototype.newItemSave = function (updateData) {
+Store.prototype.add = function (updateData) {
   var todos = this.readAll(this.dbName);
   todos.push(updateData);
   (0,_util_helper_js__WEBPACK_IMPORTED_MODULE_0__.localSave)(this.dbName, todos);
 };
-Store.prototype.deleteItemSave = function (id) {
+Store.prototype["delete"] = function (id) {
   var todos = this.readAll(this.dbName);
   var deletedTodos = todos.filter(function (v) {
     return v.id !== id;
   });
   (0,_util_helper_js__WEBPACK_IMPORTED_MODULE_0__.localSave)(this.dbName, deletedTodos);
 };
-Store.prototype.dropItemsSave = function (currentPage) {
+Store.prototype.drop = function (currentPage) {
   if (currentPage === 'All') {
     var todos = [];
     (0,_util_helper_js__WEBPACK_IMPORTED_MODULE_0__.localSave)(this.dbName, todos);
@@ -394,7 +385,7 @@ Store.prototype.dropItemsSave = function (currentPage) {
     (0,_util_helper_js__WEBPACK_IMPORTED_MODULE_0__.localSave)(this.dbName, deletedTodos);
   }
 };
-Store.prototype.updateItemSave = function (id, updateData) {
+Store.prototype.update = function (id, updateData) {
   var todos = this.readAll(this.dbName);
   var index = todos.findIndex(function (v) {
     return v.id === id;
@@ -404,12 +395,57 @@ Store.prototype.updateItemSave = function (id, updateData) {
   }
   (0,_util_helper_js__WEBPACK_IMPORTED_MODULE_0__.localSave)(this.dbName, todos);
 };
-Store.prototype.toggleAllSave = function (completedAll) {
+Store.prototype.toggleAll = function (completed) {
   var todos = this.readAll(this.dbName);
   for (var i = 0; i < todos.length; i++) {
-    todos[i].completed = completedAll;
+    todos[i].completed = completed;
   }
   (0,_util_helper_js__WEBPACK_IMPORTED_MODULE_0__.localSave)(this.dbName, todos);
+};
+
+/***/ }),
+
+/***/ "./src/js/template.js":
+/*!****************************!*\
+  !*** ./src/js/template.js ***!
+  \****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Template)
+/* harmony export */ });
+/* harmony import */ var _constant_textData_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constant/textData.js */ "./src/constant/textData.js");
+
+function Template() {
+  this.defaultTemplate = function (data) {
+    return "\n  <li data-id=\"".concat(data.id, "\" class=\"px-3 relative\">\n    <div class=\"view relative flex\">\n      <input class=\"toggle checked:border w-8 border-none appearance-none absolute inset-y-0 cursor-pointer peer/input\" type=\"checkbox\" ").concat(data.completed ? 'checked' : '', ">\n      </input>\n      <label class=\"list_elem w-full pl-10 my-2 bg-22 bg-no-repeat \n      transition \n      peer-checked/input:bg-heart-fill peer-checked/input:text-gray-300\n      peer-checked/input:line-through bg-heart-border bg-left list_elem block break-all\n      peer/text dark:bg-heart-border-white dark:text-slate-100 peer-checked/input:dark:bg-heart-fill-purple peer-checked/input:dark:text-slate-400\n      \">\n        ").concat(data.title, "\n      </label>\n      <button class=\"editButton m-auto cursor-pointer w-6 h-8 text-2xl absolute right-0 inset-y-0 bg-19 bg-no-repeat bg-center bg-icon-editMenu dark:invert\"></button>\n    </div>\n    <ul class=\"editMenu absolute top-0 right-[35px] w-20 h-20 ml-20 rounded-xl bg-white border text-sm dark:bg-slate-700 z-10 hidden\">\n      <li class=\"editItem h-1/2 flex items-center justify-center cursor-pointer dark:text-slate-200 hover:opacity-40\">\uC218\uC815</li>\n      <hr/>\n      <li class=\"delete h-1/2 flex items-center justify-center cursor-pointer dark:text-slate-200 hover:opacity-40\">\uC0AD\uC81C</li>\n    </ul>\n  </li>");
+  };
+  this.dropModalTemplate = function (status) {
+    return "\n  <div id=\"modalBackground\" class=\"flex justify-center items-center fixed top-0 left-0 w-full h-full backdrop-blur-sm backdrop-brightness-[.8]\">\n    <div class=\"min-w-[290px] w-auto h-42 bg-white rounded-xl relative dark:bg-slate-600 dark:text-slate-100\">\n      <button id=\"exit\" class=\"cursor-pointer w-6 h-6 text-xl font-semibold absolute right-0 mr-3 mt-2\">x</button>\n      <div class=\"pt-12 pb-7 px-6 text-center break-all\">".concat(_constant_textData_js__WEBPACK_IMPORTED_MODULE_0__.MODAL_TEXT[status], "</div>\n      <hr />\n      <div class=\"flex\">\n        <button id=\"cancel\" class=\"w-1/2 h-12\">\uCDE8\uC18C</button>\n        <div class=\"border-l\"></div>\n        <button id=\"drop\" class=\"w-1/2 text-red-500\">\uC0AD\uC81C</button>\n      </div>\n    </div>\n  </div>");
+  };
+  this.noDataTemplate = function (status) {
+    return "\n  <div class=\"text-center mt-20 h-full text-stone-500 dark:text-slate-300\">".concat(_constant_textData_js__WEBPACK_IMPORTED_MODULE_0__.NO_DATA_TEXT[status], "</div>\n  ");
+  };
+}
+Template.prototype.showMainTemplate = function (data) {
+  var _this = this;
+  if (data.length === 0) {
+    var currentPage = document.location.hash;
+    var status = currentPage.includes('completed') ? 'completed' : 'default';
+    return this.noDataTemplate(status);
+  }
+  var view = '';
+  data.forEach(function (value) {
+    view += _this.defaultTemplate(value);
+  });
+  return view;
+};
+Template.prototype.showModalTemplate = function () {
+  var currentPage = document.location.hash;
+  var status = currentPage.includes('completed') ? 'completed' : currentPage.includes('active') ? 'active' : 'all';
+  return this.dropModalTemplate(status);
 };
 
 /***/ }),
@@ -426,30 +462,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ View)
 /* harmony export */ });
 /* harmony import */ var _util_helper_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/helper.js */ "./src/util/helper.js");
-/* harmony import */ var _util_template_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/template.js */ "./src/util/template.js");
 
-
-function View() {
-  this.showTemplate = _util_template_js__WEBPACK_IMPORTED_MODULE_1__["default"];
+function View(template) {
+  this.template = template;
   this.$darkMode = document.querySelector('#dark-mode-toggle');
   this.$date = document.querySelector('.date');
   this.$todoList = document.querySelector('#todo-list');
   this.$toggleAll = document.querySelector('#toggle-all');
   this.$newTodo = document.querySelector('.new-todo');
-  this.$activeCounter = document.querySelector('.todo-count');
-  this.$completedCounter = document.querySelector('.done-count');
+  this.$activeCounter = document.querySelector('.active-count');
+  this.$completedCounter = document.querySelector('.completed-count');
   this.$allDestroy = document.querySelector('.all-destroy');
   this.$modal = document.querySelector('.modal');
   this.$post = document.querySelector('#post');
 }
-
-// 화살표 함수와 function() 차이점 공부
-
 View.prototype.getDate = function () {
   var now = new Date();
   return "\n  ".concat(now.getFullYear(), ".").concat(now.getMonth() + 1, ".").concat(now.getDate(), " \n  ");
 };
-View.prototype._itemId = function (element) {
+View.prototype.getItemId = function (element) {
   var $li = (0,_util_helper_js__WEBPACK_IMPORTED_MODULE_0__.findParent)(element, 'li');
   return parseInt($li.dataset.id, 10);
 };
@@ -465,12 +496,9 @@ View.prototype.toggleItem = function (id, completed) {
     elem.querySelector('input').checked = completed;
   }
 };
-View.prototype.allCompleted = function (allCompleted) {
-  this.$toggleAll.checked = allCompleted;
-};
 View.prototype.toggleAll = function () {
   var completedAll = this.$toggleAll.checked;
-  var elem = document.querySelectorAll('#toggle');
+  var elem = document.querySelectorAll('.toggle');
   if (elem) {
     elem.forEach(function (_, idx) {
       elem[idx].checked = completedAll;
@@ -486,21 +514,28 @@ View.prototype.editItem = function (id, title) {
   div.classList.add('hidden');
   var input = document.createElement('input');
   input.id = 'edit';
-  input.className = 'w-full border-b outline-none pl-10 pb-1 pt-2 mb-1';
+  input.className = 'w-[97%] border-b outline-none pl-8 pb-1 pt-2 mb-1 mr-2';
   elem.appendChild(input);
   input.focus();
   input.value = title;
 };
 View.prototype.openEditMenu = function (id) {
+  var $openedUl = document.querySelector('.opened');
+  if ($openedUl) {
+    $openedUl.classList.add('hidden');
+    $openedUl.classList.remove('opened');
+  }
   var elem = document.querySelector('[data-id="' + id + '"]');
   if (elem) {
-    elem.querySelector('ul').classList.remove('hidden');
+    elem.querySelector('ul').classList.toggle('hidden');
+    elem.querySelector('ul').classList.toggle('opened');
   }
 };
 View.prototype.closeEditMenu = function () {
-  var elem = document.querySelector('#editMenu');
+  var elem = document.querySelector('.opened');
   if (elem) {
-    elem.parentNode.removeChild(elem);
+    elem.classList.add('hidden');
+    elem.classList.remove('opened');
   }
 };
 View.prototype.editItemDone = function (id, title) {
@@ -514,44 +549,38 @@ View.prototype.editItemDone = function (id, title) {
   elem.removeChild(input);
   elem.querySelector('label').textContent = title;
 };
-View.prototype.controlPostButton = function () {
-  var elem = document.querySelector('#post');
-  elem.classList.add('hover:text-blue-700');
-};
 View.prototype.render = function (viewCmd, parameter) {
   var _this = this;
   var viewCommands = {
     darkMode: function darkMode() {
       document.documentElement.classList.toggle('dark');
     },
-    showMain: function showMain() {
+    showDate: function showDate() {
       _this.$date.innerHTML = _this.getDate();
     },
     showEntries: function showEntries() {
-      _this.$todoList.innerHTML = _this.showTemplate(parameter);
-      if (parameter.length === 0) {
-        _this.$allDestroy.disabled = true;
-      } else {
-        _this.$allDestroy.disabled = false;
-      }
+      _this.$todoList.innerHTML = _this.template.showMainTemplate(parameter);
+      _this.$allDestroy.disabled = parameter.length === 0;
     },
-    addItemDoing: function addItemDoing() {
+    activePostButton: function activePostButton() {
       _this.$post.disabled = false;
       _this.$post.classList.remove('opacity-30');
     },
-    addItemDone: function addItemDone() {
-      _this.$newTodo.value = '';
+    disablePostButton: function disablePostButton() {
       _this.$post.disabled = true;
       _this.$post.classList.add('opacity-30');
+    },
+    addItemDone: function addItemDone() {
+      _this.$newTodo.value = '';
     },
     openEditMenu: function openEditMenu() {
       _this.openEditMenu(parameter);
     },
     closeEditMenu: function closeEditMenu() {
-      _this.closeEditMenu();
+      _this.closeEditMenu(parameter);
     },
     openDropModal: function openDropModal() {
-      _this.$modal.innerHTML = (0,_util_template_js__WEBPACK_IMPORTED_MODULE_1__["default"])('modal');
+      _this.$modal.innerHTML = _this.template.showModalTemplate('modal');
     },
     closeDropModal: function closeDropModal() {
       _this.$modal.innerHTML = '';
@@ -563,10 +592,7 @@ View.prototype.render = function (viewCmd, parameter) {
       _this.toggleItem(parameter.id, parameter.completed);
     },
     toggleAll: function toggleAll() {
-      _this.toggleAll();
-    },
-    allCompleted: function allCompleted() {
-      _this.allCompleted(parameter.allCompleted);
+      _this.$toggleAll.checked = parameter.completed;
     },
     editItem: function editItem() {
       _this.editItem(parameter.id, parameter.title);
@@ -588,12 +614,12 @@ View.prototype.bind = function (event, handler) {
       handler();
     });
   }
-  if (event === 'addItemDoing') {
+  if (event === 'controlPostButton') {
     this.$newTodo.addEventListener('keyup', function (e) {
       if (e.target.value !== '') {
-        handler('writing');
+        handler('active');
       } else {
-        handler('noText');
+        handler('disable');
       }
     });
   }
@@ -610,14 +636,21 @@ View.prototype.bind = function (event, handler) {
   if (event === 'openEditMenu') {
     this.$todoList.addEventListener('click', function (e) {
       if (e.target.classList.contains('editButton')) {
-        handler(_this2._itemId(e.target));
+        handler(_this2.getItemId(e.target));
       }
     });
   }
   if (event === 'closeEditMenu') {
     document.addEventListener('click', function (e) {
-      if (e.target.classList.contains('opened')) {
-        console.log('123');
+      if (!e.target.classList.contains('editButton')) {
+        handler();
+      }
+    });
+  }
+  if (event === 'deleteItem') {
+    this.$todoList.addEventListener('click', function (e) {
+      if (e.target.classList.contains('delete')) {
+        handler(_this2.getItemId(e.target));
       }
     });
   }
@@ -638,16 +671,16 @@ View.prototype.bind = function (event, handler) {
   }
   if (event === 'dropItemsDone') {
     this.$modal.addEventListener('click', function (e) {
-      if (e.target.id === 'delete') {
+      if (e.target.id === 'drop') {
         handler();
       }
     });
   }
   if (event === 'toggleItem') {
     this.$todoList.addEventListener('click', function (e) {
-      if (e.target.className.split(' ')[0] === 'toggle') {
+      if (e.target.classList.contains('toggle')) {
         handler({
-          id: _this2._itemId(e.target),
+          id: _this2.getItemId(e.target),
           completed: e.target.checked
         });
       }
@@ -662,8 +695,13 @@ View.prototype.bind = function (event, handler) {
   }
   if (event === 'editItem') {
     this.$todoList.addEventListener('dblclick', function (e) {
-      if (e.target.className.includes('list_elem')) {
-        handler(_this2._itemId(e.target));
+      if (e.target.classList.contains('list_elem')) {
+        handler(_this2.getItemId(e.target));
+      }
+    });
+    this.$todoList.addEventListener('click', function (e) {
+      if (e.target.classList.contains('editItem')) {
+        handler(_this2.getItemId(e.target));
       }
     });
   }
@@ -671,7 +709,7 @@ View.prototype.bind = function (event, handler) {
     this.$todoList.addEventListener('blur', function (e) {
       if (e.target.id === 'edit') {
         handler({
-          id: _this2._itemId(e.target),
+          id: _this2.getItemId(e.target),
           title: e.target.value
         });
       }
@@ -716,48 +754,6 @@ function findParent(element, tagName) {
     return element.parentNode;
   }
   return findParent(element.parentNode, tagName);
-}
-
-/***/ }),
-
-/***/ "./src/util/template.js":
-/*!******************************!*\
-  !*** ./src/util/template.js ***!
-  \******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ showTemplate)
-/* harmony export */ });
-/* harmony import */ var _constant_textData_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constant/textData.js */ "./src/constant/textData.js");
-
-var dropModalTemplate = function dropModalTemplate(status) {
-  return "\n    <div\n      id=\"modalBackground\"\n      class=\"flex justify-center items-center fixed top-0 left-0 w-full h-full backdrop-blur-sm backdrop-brightness-[.8]\">\n      <div class=\"min-w-[290px] w-auto h-42 bg-white rounded-xl relative dark:bg-slate-600 dark:text-slate-100\">\n        <button id=\"exit\" class=\"cursor-pointer w-6 h-6 text-xl font-semibold absolute right-0 mr-3 mt-2\">x</button>\n        <div class=\"pt-12 pb-7 px-6 text-center break-all\">".concat(_constant_textData_js__WEBPACK_IMPORTED_MODULE_0__.MODAL_TEXT[status], "</div>\n        <hr />\n        <div class=\"flex\">\n          <button id=\"cancel\" class=\"w-1/2 h-12\">\uCDE8\uC18C</button>\n          <div class=\"border-l\"></div>\n          <button id=\"delete\" class=\"w-1/2 text-red-500\">\uC0AD\uC81C</button>\n        </div>\n      </div>\n    </div>\n");
-};
-var noDataTemplate = function noDataTemplate(status) {
-  return "\n  <div class=\"m-auto text-center py-7 text-stone-500 dark:text-slate-300\">".concat(_constant_textData_js__WEBPACK_IMPORTED_MODULE_0__.NO_DATA_TEXT[status], "</div>\n");
-};
-var template = function template(data) {
-  return "<li data-id=\"".concat(data.id, "\" class=\"px-3 relative\">\n    <div class=\"view relative flex\">\n    <input id=\"toggle\" class=\"toggle checked:border w-8 border-none appearance-none absolute inset-y-0 cursor-pointer peer/input\" type=\"checkbox\" ").concat(data.completed ? 'checked' : '', ">\n    <label class=\"list_elem w-full pl-10 my-2 bg-22 bg-no-repeat \n    transition \n    peer-checked/input:bg-heart-fill\n    peer-checked/input:text-gray-300\n    peer-checked/input:line-through\n    bg-heart-border\n    bg-left    \n    list_elem block \n    break-all\n    peer/text\n    dark:bg-heart-border-white\n    dark:text-slate-100\n    peer-checked/input:dark:bg-heart-fill-purple\n    peer-checked/input:dark:text-slate-400\n    \">\n    ").concat(data.title, "\n    </label>\n    <button class=\"editButton m-auto cursor-pointer w-6 h-8 text-2xl absolute right-0 inset-y-0 bg-19 bg-no-repeat bg-center bg-icon-editMenu dark:invert\">\n    </button>\n    </div>\n    <ul class=\"editMenu absolute top-0 right-[35px] w-20 h-20 ml-20 rounded-xl bg-white border text-sm dark:bg-slate-700 z-10 hidden\">\n      <li class=\"border-b h-1/2 flex items-center justify-center cursor-pointer\">\uC218\uC815</li>\n      <li class=\"h-1/2 flex items-center justify-center cursor-pointer\">\uC0AD\uC81C</li>\n    </ul>\n    </li>");
-};
-function showTemplate(data) {
-  if (data === 'modal') {
-    var currentPage = document.location.hash;
-    var status = currentPage.includes('completed') ? 'completed' : currentPage.includes('active') ? 'active' : 'all';
-    return dropModalTemplate(status);
-  }
-  if (data.length === 0) {
-    var _currentPage = document.location.hash;
-    var _status = _currentPage.includes('completed') ? 'completed' : 'default';
-    return noDataTemplate(_status);
-  }
-  var view = '';
-  data.forEach(function (value) {
-    view += template(value);
-  });
-  return view;
 }
 
 /***/ }),

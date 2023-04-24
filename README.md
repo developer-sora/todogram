@@ -1,6 +1,6 @@
 # Todogram
-![whiteTOdo](https://user-images.githubusercontent.com/75163849/233970067-e1445598-d157-493f-b49b-c14f69ba40b8.png)
-![darkTodo](https://user-images.githubusercontent.com/75163849/233970087-4dd7f0f3-01ba-45e0-8a0b-ebc9019b6d8e.png)
+![todo](https://user-images.githubusercontent.com/75163849/233972121-114197e3-586d-422f-bfbe-e797e256b9d2.png)
+
 
 📌링크 
 https://developer-sora.github.io/Todos_VanillaJS/#

@@ -40,16 +40,6 @@ View.prototype.toggleItem = function (id, completed) {
   }
 };
 
-View.prototype.toggleAll = function () {
-  const completedAll = this.$toggleAll.checked;
-  const elem = document.querySelectorAll('.toggle');
-  if (elem) {
-    elem.forEach((_, idx) => {
-      elem[idx].checked = completedAll;
-    });
-  }
-};
-
 View.prototype.editItem = function (id, title) {
   const elem = document.querySelector('[data-id="' + id + '"]');
   if (!elem) {
@@ -161,8 +151,7 @@ View.prototype.bind = function (event, handler) {
     this.$darkMode.addEventListener('click', () => {
       handler();
     });
-  }
-  if (event === 'controlPostButton') {
+  } else if (event === 'controlPostButton') {
     this.$newTodo.addEventListener('keyup', e => {
       if (e.target.value !== '') {
         handler('active');
@@ -170,8 +159,7 @@ View.prototype.bind = function (event, handler) {
         handler('disable');
       }
     });
-  }
-  if (event === 'addItemDone') {
+  } else if (event === 'addItemDone') {
     this.$newTodo.addEventListener('keyup', e => {
       if (e.target.value !== '' && e.key === 'Enter') {
         handler(this.$newTodo.value);
@@ -180,34 +168,29 @@ View.prototype.bind = function (event, handler) {
     this.$post.addEventListener('click', () => {
       handler(this.$newTodo.value);
     });
-  }
-  if (event === 'openEditMenu') {
+  } else if (event === 'openEditMenu') {
     this.$todoList.addEventListener('click', e => {
       if (e.target.classList.contains('editButton')) {
         handler(this.getItemId(e.target));
       }
     });
-  }
-  if (event === 'closeEditMenu') {
+  } else if (event === 'closeEditMenu') {
     document.addEventListener('click', e => {
       if (!e.target.classList.contains('editButton')) {
         handler();
       }
     });
-  }
-  if (event === 'deleteItem') {
+  } else if (event === 'deleteItem') {
     this.$todoList.addEventListener('click', e => {
       if (e.target.classList.contains('delete')) {
         handler(this.getItemId(e.target));
       }
     });
-  }
-  if (event === 'openDropModal') {
+  } else if (event === 'openDropModal') {
     this.$allDestroy.addEventListener('click', () => {
       handler();
     });
-  }
-  if (event === 'closeDropModal') {
+  } else if (event === 'closeDropModal') {
     document.addEventListener('click', e => {
       if (e.target.id === 'modalBackground') handler();
     });
@@ -216,15 +199,13 @@ View.prototype.bind = function (event, handler) {
         handler();
       }
     });
-  }
-  if (event === 'dropItemsDone') {
+  } else if (event === 'dropItemsDone') {
     this.$modal.addEventListener('click', e => {
       if (e.target.id === 'drop') {
         handler();
       }
     });
-  }
-  if (event === 'toggleItem') {
+  } else if (event === 'toggleItem') {
     this.$todoList.addEventListener('click', e => {
       if (e.target.classList.contains('toggle')) {
         handler({
@@ -233,15 +214,13 @@ View.prototype.bind = function (event, handler) {
         });
       }
     });
-  }
-  if (event === 'toggleAll') {
+  } else if (event === 'toggleAll') {
     this.$toggleAll.addEventListener('click', e => {
       if (e.target.id === 'toggle-all') {
         handler(e.target.checked);
       }
     });
-  }
-  if (event === 'editItem') {
+  } else if (event === 'editItem') {
     this.$todoList.addEventListener('dblclick', e => {
       if (e.target.classList.contains('list_elem')) {
         handler(this.getItemId(e.target));
@@ -252,8 +231,7 @@ View.prototype.bind = function (event, handler) {
         handler(this.getItemId(e.target));
       }
     });
-  }
-  if (event === 'editItemDone') {
+  } else if (event === 'editItemDone') {
     this.$todoList.addEventListener(
       'blur',
       e => {
@@ -273,6 +251,3 @@ View.prototype.bind = function (event, handler) {
     });
   }
 };
-
-// blur에 true넣는 이유??
-// 이벤트 캡쳐링..

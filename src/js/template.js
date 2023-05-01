@@ -8,10 +8,10 @@ export default function Template() {
         data.completed ? 'checked' : ''
       }>
       </input>
-      <label class="list_elem w-full pl-10 my-2 bg-22 bg-no-repeat 
+      <label class="list_elem text-sm inline-block pl-10 my-2 mr-4 bg-22 bg-no-repeat 
       transition 
       peer-checked/input:bg-heart-fill peer-checked/input:text-gray-300
-      peer-checked/input:line-through bg-heart-border bg-left list_elem block break-all
+      peer-checked/input:line-through bg-heart-border bg-left break-all
       peer/text dark:bg-heart-border-white dark:text-slate-100 peer-checked/input:dark:bg-heart-fill-purple peer-checked/input:dark:text-slate-400
       ">
         ${data.title}

@@ -6,7 +6,7 @@ export default function Template() {
     <div class="view relative flex">
       <input class="toggle checked:border w-8 border-none appearance-none absolute inset-y-0 cursor-pointer peer/input" type="checkbox" ${
         data.completed ? 'checked' : ''
-      }>
+      } aria-label="완료하기">
       </input>
       <label class="list_elem text-sm inline-block pl-10 my-2 mr-4 bg-22 bg-no-repeat 
       transition 
@@ -16,7 +16,7 @@ export default function Template() {
       ">
         ${data.title}
       </label>
-      <button class="editButton m-auto cursor-pointer w-6 h-8 text-2xl absolute right-0 inset-y-0 bg-19 bg-no-repeat bg-center bg-icon-editMenu dark:invert"></button>
+      <button class="editButton m-auto cursor-pointer w-6 h-8 text-2xl absolute right-0 inset-y-0 bg-19 bg-no-repeat bg-center bg-icon-editMenu dark:invert" aria-label="할 일 설정"></button>
     </div>
     <ul class="editMenu absolute top-0 right-[35px] w-20 h-20 ml-20 rounded-xl bg-white border text-sm dark:bg-slate-700 z-10 hidden">
       <li class="editItem h-1/2 flex items-center justify-center cursor-pointer dark:text-slate-200 hover:opacity-40">수정</li>

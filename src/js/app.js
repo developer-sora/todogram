@@ -3,6 +3,7 @@ import Model from './model.js';
 import Controller from './controller.js';
 import View from './view.js';
 import Template from './template.js';
+import '../tailwind.css';
 
 (function () {
   function Todo() {

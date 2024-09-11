@@ -5,21 +5,25 @@ import View from './view.js';
 import Template from './template.js';
 import '../tailwind.css';
 
-(function () {
-  function Todo() {
+class Todo {
+  constructor() {
     this.storage = new Store('todoList');
     this.model = new Model(this.storage);
     this.template = new Template();
     this.view = new View(this.template);
     this.controller = new Controller(this.model, this.view);
+    this.initialize();
   }
 
-  const todo = new Todo();
-
-  function setView() {
-    todo.controller.setView(document.location.hash);
+  initialize() {
+    this.setView();
+    window.addEventListener('hashchange', () => this.setView());
+    window.addEventListener('load', () => this.setView());
   }
 
-  window.addEventListener('load', setView);
-  window.addEventListener('hashchange', setView);
-})();
+  setView() {
+    this.controller.setView(window.location.hash);
+  }
+}
+
+new Todo();

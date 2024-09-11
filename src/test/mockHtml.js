@@ -1,3 +1,4 @@
+const mockHtml = `
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -83,3 +84,6 @@
     <div class="modal" role="dialog" aria-modal="true" aria-label="전체 삭제 모달"></div>
   </body>
 </html>
+`;
+
+export default mockHtml;

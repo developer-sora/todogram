@@ -1,7 +1,1 @@
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
-<svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="SVGRepo_bgCarrier" stroke-width="0"/>
-<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-<g id="SVGRepo_iconCarrier"> <g clip-path="url(#clip0_429_11122)"> <rect x="12" y="12" width="0.01" height="0.01" stroke="#292929" stroke-width="3.75" stroke-linejoin="round"/> <rect x="12" y="5" width="0.01" height="0.01" stroke="#292929" stroke-width="3.75" stroke-linejoin="round"/> <rect x="12" y="19" width="0.01" height="0.01" stroke="#292929" stroke-width="3.75" stroke-linejoin="round"/> </g> <defs> <clipPath id="clip0_429_11122"> <rect width="24" height="24" fill="white" transform="translate(0 0.000915527)"/> </clipPath> </defs> </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 24 24"><g stroke="#292929" stroke-linejoin="round" stroke-width="3.75" clip-path="url(#a)"><path d="M12 12h.01v.01H12zm0-7h.01v.01H12zm0 14h.01v.01H12z"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h24v24H0z"/></clipPath></defs></svg>

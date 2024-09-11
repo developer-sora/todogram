@@ -5,7 +5,7 @@ module.exports = {
   theme: {
     backgroundSize: {
       19: '19px',
-      22: '22px',
+      22: '20px',
     },
     backgroundImage: {
       'heart-border': "url('../static/images/heart-border.svg')",

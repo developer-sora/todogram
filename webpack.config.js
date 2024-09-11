@@ -2,9 +2,11 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
-  entry: ['@babel/polyfill', './src/js/app.js'],
+  mode: 'production',
+  entry: ['core-js/stable', './src/js/app.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
@@ -12,9 +14,16 @@ module.exports = {
     clean: true,
   },
   plugins: [
-    new HtmlWebpackPlugin({ template: 'src/index.html', favicon: 'static/favicon.ico' }),
+    new HtmlWebpackPlugin({
+      template: 'src/index.html',
+      minify: {
+        collapseWhitespace: true,
+        removeComments: true,
+      },
+      favicon: 'static/favicon.ico',
+    }),
     new CopyPlugin({
-      patterns: [{ from: 'static/images', to: 'images' }],
+      patterns: [{ from: 'static/assets', to: 'assets' }],
     }),
     new MiniCssExtractPlugin({ filename: 'styles.css' }),
   ],
@@ -22,13 +31,9 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        include: [path.resolve(__dirname, 'src')],
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env'],
-          },
         },
       },
       {
@@ -41,12 +46,30 @@ module.exports = {
         ],
       },
       {
-        test: /\.(png|svg|jpg|jpeg|gif)$/i,
-        type: 'asset/resource',
-        generator: {
-          filename: 'images/[name][ext][query]',
+        test: /\.(png|jpg|jpeg|gif|svg)$/,
+        type: 'asset/inline',
+        parser: {
+          dataUrlCondition: {
+            maxSize: 8 * 1024,
+          },
         },
       },
+    ],
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: {
+            drop_console: true, // console.log 제거
+          },
+          output: {
+            comments: false, // 주석 제거
+          },
+        },
+        extractComments: false, // 별도의 주석 파일 생성하지 않음
+      }),
     ],
   },
   devServer: {
@@ -57,5 +80,4 @@ module.exports = {
     hot: true,
   },
   devtool: 'source-map',
-  mode: 'production',
 };

@@ -1,56 +1,62 @@
-export default function Model(storage) {
-  this.storage = storage;
-}
-
-Model.prototype.read = function (query) {
-  if (query) {
-    return this.storage.read(query);
+export default class Model {
+  constructor(storage) {
+    this.storage = storage;
   }
-  return this.storage.readAll();
-};
 
-Model.prototype.create = function (title) {
-  const newTodos = {
-    title,
-    completed: false,
-    id: new Date().getTime(),
-  };
-  this.storage.add(newTodos);
-};
+  read(query) {
+    if (query) {
+      return this.storage.read(query);
+    }
+    return this.storage.readAll();
+  }
 
-Model.prototype.delete = function (id) {
-  this.storage.delete(id);
-};
+  create(title) {
+    const newTodos = {
+      title,
+      completed: false,
+      id: new Date().getTime(),
+    };
+    this.storage.add(newTodos);
+  }
 
-Model.prototype.drop = function (currentPage) {
-  this.storage.drop(currentPage);
-};
+  delete(id) {
+    this.storage.delete(id);
+  }
 
-Model.prototype.update = function (id, updateData) {
-  this.storage.update(id, updateData);
-};
+  drop(currentPage) {
+    this.storage.drop(currentPage);
+  }
 
-Model.prototype.toggleAll = function (completed) {
-  this.storage.toggleAll(completed);
-};
+  update(id, updateData) {
+    this.storage.update(id, updateData);
+  }
 
-Model.prototype.getCount = function (callback) {
-  const todos = {
-    total: 0,
-    active: 0,
-    completed: 0,
-  };
+  toggleAll(completed) {
+    this.storage.toggleAll(completed);
+  }
 
-  const data = this.storage.readAll();
+  getCount(callback) {
+    const data = this.storage.readAll();
 
-  data.forEach(todo => {
-    if (todo.completed) {
-      todos.completed++;
-    } else todos.active++;
-    todos.total++;
-  });
+    const todos = data.reduce(
+      (acc, todo) => {
+        if (todo.completed) {
+          acc.completed++;
+        } else {
+          acc.active++;
+        }
+        acc.total++;
+        return acc;
+      },
+      {
+        total: 0,
+        active: 0,
+        completed: 0,
+      }
+    );
 
-  callback(todos);
+    callback(todos);
 
-  return todos;
-};
+    return todos;
+  }
+}

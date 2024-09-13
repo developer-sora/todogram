@@ -1,15 +1,14 @@
-import { localRead, localSave } from '../util/helper.js';
-
 export default class Store {
-  constructor(name) {
+  constructor(name, storage) {
     this.dbName = name;
-    if (!localRead(name)) {
-      localSave(name, []);
+    this.storage = storage;
+    if (!this.storage.readAll(this.dbName)) {
+      this.storage.save(this.dbName, []);
     }
   }
 
   readAll() {
-    return localRead(this.dbName);
+    return this.storage.readAll(this.dbName);
   }
 
   read(query) {
@@ -22,13 +21,13 @@ export default class Store {
   add(updateData) {
     const todos = this.readAll();
     todos.push(updateData);
-    localSave(this.dbName, todos);
+    this.storage.save(this.dbName, todos);
   }
 
   delete(id) {
     const todos = this.readAll();
     const deleteCompleteTodos = todos.filter(todo => todo.id !== id);
-    localSave(this.dbName, deleteCompleteTodos);
+    this.storage.save(this.dbName, deleteCompleteTodos);
   }
 
   drop(currentPage) {
@@ -39,7 +38,7 @@ export default class Store {
       const state = currentPage !== 'Active';
       todos = todos.filter(todo => todo.completed !== state);
     }
-    localSave(this.dbName, todos);
+    this.storage.save(this.dbName, todos);
   }
 
   update(id, updateData) {
@@ -47,13 +46,13 @@ export default class Store {
     const index = todos.findIndex(todo => todo.id === id);
     if (index !== -1) {
       todos[index] = { ...todos[index], ...updateData };
-      localSave(this.dbName, todos);
+      this.storage.save(this.dbName, todos);
     }
   }
 
   toggleAll(completed) {
     const todos = this.readAll();
     todos.forEach(todo => (todo.completed = completed));
-    localSave(this.dbName, todos);
+    this.storage.save(this.dbName, todos);
   }
 }

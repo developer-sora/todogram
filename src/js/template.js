@@ -25,7 +25,7 @@ export default class Template {
         </label>
         <button class="editButton m-auto cursor-pointer w-6 h-8 text-2xl absolute right-0 inset-y-0 bg-19 bg-no-repeat bg-center bg-icon-editMenu dark:invert" aria-label="할 일 설정"></button>
       </div>
-      <ul class="editMenu absolute top-0 right-[35px] w-20 h-20 ml-20 rounded-xl bg-white border text-sm dark:bg-slate-700 z-10 hidden">
+      <ul class="editMenu absolute top-0 right-[35px] w-20 h-20 ml-20 rounded-xl bg-white border text-sm dark:bg-slate-700 z-10 hidden" aria-label="수정 모드">
         <li class="editItem h-1/2 flex items-center justify-center cursor-pointer dark:text-slate-200 hover:opacity-40">수정</li>
         <hr/>
         <li class="delete h-1/2 flex items-center justify-center cursor-pointer dark:text-slate-200 hover:opacity-40">삭제</li>
@@ -35,7 +35,7 @@ export default class Template {
 
   createDropModalTemplate() {
     return status => `
-    <div id="modalBackground" class="flex justify-center items-center fixed top-0 left-0 w-full h-full backdrop-blur-sm backdrop-brightness-[.8]">
+    <div id="dropModalBackground" class="flex justify-center items-center fixed top-0 left-0 w-full h-full backdrop-blur-sm backdrop-brightness-[.8]">
       <div class="min-w-[290px] w-auto h-42 bg-white rounded-xl relative dark:bg-slate-600 dark:text-slate-100">
         <button id="exit" class="cursor-pointer w-6 h-6 text-xl font-semibold absolute right-0 mr-3 mt-2">x</button>
         <div class="pt-12 pb-7 px-6 text-center break-all">${MODAL_TEXT[status]}</div>

@@ -98,7 +98,7 @@ export default class View {
       addItemDone: () => (this.$newTodo.value = ''),
       openEditMenu: () => this.toggleEditMenu(parameter, true),
       closeEditMenu: () => this.closeEditMenu(),
-      openDropModal: () => (this.$modal.innerHTML = this.template.showModalTemplate('modal')),
+      openDropModal: () => (this.$modal.innerHTML = this.template.showModalTemplate()),
       closeDropModal: () => (this.$modal.innerHTML = ''),
       deleteItem: () => this.deleteItem(parameter),
       toggleItem: () => this.toggleItem(parameter.id, parameter.completed),

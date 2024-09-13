@@ -131,7 +131,7 @@ export default class Controller {
   filter(force) {
     this.updateCount();
     if (force || this.lastActiveRoute !== this.activeRoute) {
-      this[`show${this.activeRoute}`]();
+      this[`show${this.activeRoute ?? 'All'}`]();
     }
     this.lastActiveRoute = this.activeRoute;
   }

@@ -1,77 +1,86 @@
 import Store from '../js/store.js';
 import Model from '../js/model.js';
 
+jest.mock('../js/store.js');
+
 describe('Model 테스트', () => {
-  class LocalStorageMock {
-    constructor() {
-      this.storage = {};
-    }
-
-    clear() {
-      this.storage = {};
-    }
-
-    getItem(key) {
-      return this.storage[key] || null;
-    }
-
-    setItem(key, value) {
-      this.storage[key] = String(value);
-    }
-
-    removeItem(key) {
-      delete this.storage[key];
-    }
-  }
-
   let store;
   let model;
-  let currentPage = 'All';
 
   beforeEach(() => {
-    if (typeof window === 'undefined') {
-      global.localStorage = new LocalStorageMock();
-    }
-    store = new Store('test');
+    store = new Store();
     model = new Model(store);
   });
 
-  afterEach(() => {
-    global.localStorage.clear();
+  test('read 메서드가 query를 전달하면 store.read(query)를 호출한다', () => {
+    const query = { id: 1 };
+    model.read(query);
+    expect(store.read).toHaveBeenCalledWith(query);
   });
 
-  test('새로운 할 일을 추가하면 목록에 항목이 하나 추가된다.', () => {
-    const todoListCount = store.readAll().length;
-    model.create('test');
-    expect(store.readAll().length).toBe(todoListCount + 1);
+  test('read 메서드가 query를 전달하지 않으면 store.readAll을 호출한다', () => {
+    model.read();
+    expect(store.readAll).toHaveBeenCalled();
   });
 
-  test('할 일을 하나 삭제하면 목록에서 항목이 하나 삭제된다.', () => {
-    model.create('test');
-    const todoListCount = store.readAll().length;
-    const todoId = store.readAll()[0].id;
-    model.delete(todoId);
-    expect(store.readAll().length).toBe(todoListCount - 1);
+  test('create 메서드가 호출되면 store.add가 새로운 항목을 추가한다', () => {
+    const title = 'test1';
+    const newTodo = {
+      title,
+      completed: false,
+      id: new Date().getTime(),
+    };
+
+    model.create(title);
+    expect(store.add).toHaveBeenCalledWith(newTodo);
   });
 
-  test('할 일을 수정하면 목록에 수정된 내용이 반영이 된다.', () => {
-    model.create('test');
-    const todoId = store.readAll()[0].id;
-    model.update(todoId, { title: 'test2' });
-    expect(store.readAll()[0].title).toBe('test2');
+  test('delete 메서드가 호출되면 store.delete를 호출한다', () => {
+    const id = 1;
+    model.delete(id);
+    expect(store.delete).toHaveBeenCalledWith(id);
   });
 
-  test('할 일을 완료하면 목록에 완료 상태가 반영이 된다.', () => {
-    model.create('test');
-    const todoId = store.readAll()[0].id;
-    model.update(todoId, { completed: true });
-    expect(store.readAll()[0].completed).toBeTruthy();
-  });
-
-  test('할 일을 전부 삭제하면 목록이 빈 상태가 된다.', () => {
-    model.create('test');
-    model.create('test');
+  test('drop 메서드가 호출되면 store.drop을 호출한다', () => {
+    const currentPage = 'All';
     model.drop(currentPage);
-    expect(store.readAll().length).toBe(0);
+    expect(store.drop).toHaveBeenCalledWith(currentPage);
+  });
+
+  test('update 메서드가 호출되면 store.update를 호출한다', () => {
+    const id = 1;
+    const updateData = { title: 'Updated Todo' };
+    model.update(id, updateData);
+    expect(store.update).toHaveBeenCalledWith(id, updateData);
+  });
+
+  test('toggleAll 메서드가 호출되면 store.toggleAll을 호출한다', () => {
+    const completed = true;
+    model.toggleAll(completed);
+    expect(store.toggleAll).toHaveBeenCalledWith(completed);
+  });
+
+  test('getCount 메서드가 호출되면 total, active, completed를 계산하고 callback을 호출한다', () => {
+    const todosMock = [
+      { title: 'test1', completed: true },
+      { title: 'test2', completed: false },
+    ];
+
+    store.readAll.mockReturnValue(todosMock);
+
+    const callbackMock = jest.fn();
+    const result = model.getCount(callbackMock);
+
+    expect(result).toEqual({
+      total: 2,
+      active: 1,
+      completed: 1,
+    });
+
+    expect(callbackMock).toHaveBeenCalledWith({
+      total: 2,
+      active: 1,
+      completed: 1,
+    });
   });
 });

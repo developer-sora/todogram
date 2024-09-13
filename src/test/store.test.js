@@ -17,10 +17,20 @@ describe('Store 클래스 테스트', () => {
     jest.clearAllMocks();
   });
 
-  test('초기 데이터가 없을 때 storage에 빈 배열을 넣어 초기화한다', () => {
+  test('초기 데이터가 없을 때 생성자에서 storage에 빈 배열을 넣어 초기화한다', () => {
     mockStorage.readAll.mockReturnValue(null);
     store = new Store(dbName, mockStorage);
     expect(mockStorage.save).toHaveBeenCalledWith(dbName, []);
+  });
+
+  test('storage에 데이터가 있으면 생성자에서 storage에 빈 배열을 저장하지 않는다', () => {
+    const newMockStorage = {
+      readAll: jest.fn(),
+      save: jest.fn(),
+    };
+    newMockStorage.readAll.mockReturnValue([{ id: 1, title: 'test1', completed: true }]);
+    store = new Store(dbName, newMockStorage);
+    expect(newMockStorage.save).not.toHaveBeenCalled();
   });
 
   test('readAll 메서드가 storage의 readAll 메서드를 호출한다', () => {

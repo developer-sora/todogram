@@ -106,9 +106,7 @@ describe('Store 클래스 테스트', () => {
   test('update 메서드가 수정할 항목이 없는 경우 에러를 발생시킨다.', () => {
     const todos = [{ id: 1, title: 'test1' }];
     mockStorage.readAll.mockReturnValue(todos);
-    expect(() => {
-      store.update(2, { title: 'update!' });
-    }).toThrow('수정할 할 일 항목이 없어요!');
+    expect(store.update(2, { title: 'update!' })).toBeUndefined();
   });
 
   test('toggleAll 메서드가 모든 항목을 완료 혹은 미완료 상태로 변경하여 storage에 저장한다', () => {

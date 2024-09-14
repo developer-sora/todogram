@@ -14,7 +14,7 @@ export default class Model {
     const newTodos = {
       title,
       completed: false,
-      id: new Date().getTime(),
+      id: Date.now(),
     };
     this.storage.add(newTodos);
   }

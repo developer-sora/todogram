@@ -13,8 +13,7 @@ export default class Template {
       <div class="view relative flex">
         <input class="toggle checked:border w-8 border-none appearance-none absolute inset-y-0 cursor-pointer peer/input" type="checkbox" ${
           data.completed ? 'checked' : ''
-        } aria-label="완료하기">
-        </input>
+        }aria-label="완료하기">
         <label class="list_elem text-sm inline-block pl-10 my-2 mr-4 bg-22 bg-no-repeat 
         transition 
         peer-checked/input:bg-heart-fill peer-checked/input:text-gray-300
@@ -27,7 +26,7 @@ export default class Template {
       </div>
       <ul class="editMenu absolute top-0 right-[35px] w-20 h-20 ml-20 rounded-xl bg-white border text-sm dark:bg-slate-700 z-10 hidden" aria-label="수정 모드">
         <li class="editItem h-1/2 flex items-center justify-center cursor-pointer dark:text-slate-200 hover:opacity-40">수정</li>
-        <hr/>
+        <hr>
         <li class="delete h-1/2 flex items-center justify-center cursor-pointer dark:text-slate-200 hover:opacity-40">삭제</li>
       </ul>
     </li>`;
@@ -39,7 +38,7 @@ export default class Template {
       <div class="min-w-[290px] w-auto h-42 bg-white rounded-xl relative dark:bg-slate-600 dark:text-slate-100">
         <button id="exit" class="cursor-pointer w-6 h-6 text-xl font-semibold absolute right-0 mr-3 mt-2">x</button>
         <div class="pt-12 pb-7 px-6 text-center break-all">${MODAL_TEXT[status]}</div>
-        <hr />
+        <hr>
         <div class="flex">
           <button id="cancel" class="w-1/2 h-12">취소</button>
           <div class="border-l"></div>

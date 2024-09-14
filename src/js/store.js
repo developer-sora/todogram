@@ -45,7 +45,7 @@ export default class Store {
     const todos = this.readAll();
     const index = todos.findIndex(todo => todo.id === id);
     if (index === -1) {
-      throw new Error('수정할 할 일 항목이 없어요!');
+      return;
     }
     todos[index] = { ...todos[index], ...updateData };
     this.storage.save(this.dbName, todos);

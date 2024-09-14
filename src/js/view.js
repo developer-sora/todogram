@@ -15,27 +15,27 @@ export default class View {
     this.$post = document.querySelector('#post');
   }
 
-  getDate() {
+  #getDate() {
     const now = new Date();
     return `${now.getFullYear()}.${now.getMonth() + 1}.${now.getDate()}`;
   }
 
-  getItemId(element) {
+  #getItemId(element) {
     const $li = findParent(element, 'li');
     return parseInt($li.dataset.id, 10);
   }
 
-  deleteItem(id) {
+  #deleteItem(id) {
     const elem = document.querySelector(`[data-id="${id}"]`);
     if (elem) this.$todoList.removeChild(elem);
   }
 
-  toggleItem(id, completed) {
+  #toggleItem(id, completed) {
     const elem = document.querySelector(`[data-id="${id}"]`);
     if (elem) elem.querySelector('input').checked = completed;
   }
 
-  editItem(id, title) {
+  #editItem(id, title) {
     const elem = document.querySelector(`[data-id="${id}"]`);
     if (!elem) return;
 
@@ -50,26 +50,26 @@ export default class View {
     input.focus();
   }
 
-  toggleEditMenu(id, open) {
+  #openEditMenu(id) {
     const elem = document.querySelector(`[data-id="${id}"]`);
-    if (elem) {
-      const menu = elem.querySelector('ul');
-      if (open) {
-        menu.classList.remove('hidden');
-        menu.classList.add('opened');
-      } else {
-        menu.classList.add('hidden');
-        menu.classList.remove('opened');
-      }
+    if (!elem) {
+      return;
     }
+    const menu = elem.querySelector('ul');
+    menu.classList.remove('hidden');
+    menu.classList.add('opened');
   }
 
-  closeEditMenu() {
+  #closeEditMenu() {
     const openedMenu = document.querySelector('.opened');
-    if (openedMenu) this.toggleEditMenu(this.getItemId(openedMenu), false);
+    if (!openedMenu) {
+      return;
+    }
+    openedMenu.classList.add('hidden');
+    openedMenu.classList.remove('opened');
   }
 
-  editItemDone(id, title) {
+  #editItemDone(id, title) {
     const elem = document.querySelector(`[data-id="${id}"]`);
     if (!elem) return;
 
@@ -82,7 +82,7 @@ export default class View {
   render(viewCmd, parameter) {
     const viewCommands = {
       darkMode: () => document.documentElement.classList.toggle('dark'),
-      showDate: () => (this.$date.innerHTML = this.getDate()),
+      showDate: () => (this.$date.innerHTML = this.#getDate()),
       showEntries: () => {
         this.$todoList.innerHTML = this.template.showMainTemplate(parameter);
         this.$allDestroy.disabled = parameter.length === 0;
@@ -96,15 +96,15 @@ export default class View {
         this.$post.classList.add('opacity-30');
       },
       addItemDone: () => (this.$newTodo.value = ''),
-      openEditMenu: () => this.toggleEditMenu(parameter, true),
-      closeEditMenu: () => this.closeEditMenu(),
+      openEditMenu: () => this.#openEditMenu(parameter),
+      closeEditMenu: () => this.#closeEditMenu(),
       openDropModal: () => (this.$modal.innerHTML = this.template.showModalTemplate()),
       closeDropModal: () => (this.$modal.innerHTML = ''),
-      deleteItem: () => this.deleteItem(parameter),
-      toggleItem: () => this.toggleItem(parameter.id, parameter.completed),
+      deleteItem: () => this.#deleteItem(parameter),
+      toggleItem: () => this.#toggleItem(parameter.id, parameter.completed),
       toggleAll: () => (this.$toggleAll.checked = parameter.completed),
-      editItem: () => this.editItem(parameter.id, parameter.title),
-      editItemDone: () => this.editItemDone(parameter.id, parameter.title),
+      editItem: () => this.#editItem(parameter.id, parameter.title),
+      editItemDone: () => this.#editItemDone(parameter.id, parameter.title),
       updateElementCount: () => {
         this.$activeCounter.innerHTML = parameter.active;
         this.$completedCounter.innerHTML = parameter.completed;
@@ -134,7 +134,7 @@ export default class View {
       openEditMenu: () =>
         this.$todoList.addEventListener('click', e => {
           if (e.target.classList.contains('editButton')) {
-            handler(this.getItemId(e.target));
+            handler(this.#getItemId(e.target));
           }
         }),
       closeEditMenu: () => {
@@ -147,13 +147,13 @@ export default class View {
       deleteItem: () =>
         this.$todoList.addEventListener('click', e => {
           if (e.target.classList.contains('delete')) {
-            handler(this.getItemId(e.target));
+            handler(this.#getItemId(e.target));
           }
         }),
       openDropModal: () => this.$allDestroy.addEventListener('click', handler),
       closeDropModal: () => {
         document.addEventListener('click', e => {
-          if (e.target.id === 'modalBackground') handler();
+          if (e.target.id === 'dropModalBackground') handler();
         });
         this.$modal.addEventListener('click', e => {
           if (e.target.id === 'exit' || e.target.id === 'cancel') {
@@ -171,7 +171,7 @@ export default class View {
         this.$todoList.addEventListener('click', e => {
           if (e.target.classList.contains('toggle')) {
             handler({
-              id: this.getItemId(e.target),
+              id: this.#getItemId(e.target),
               completed: e.target.checked,
             });
           }
@@ -185,12 +185,12 @@ export default class View {
       editItem: () => {
         this.$todoList.addEventListener('dblclick', e => {
           if (e.target.classList.contains('list_elem')) {
-            handler(this.getItemId(e.target));
+            handler(this.#getItemId(e.target));
           }
         });
         this.$todoList.addEventListener('click', e => {
           if (e.target.classList.contains('editItem')) {
-            handler(this.getItemId(e.target));
+            handler(this.#getItemId(e.target));
           }
         });
       },
@@ -200,7 +200,7 @@ export default class View {
           e => {
             if (e.target.id === 'edit') {
               handler({
-                id: this.getItemId(e.target),
+                id: this.#getItemId(e.target),
                 title: e.target.value,
               });
             }

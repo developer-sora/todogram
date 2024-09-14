@@ -9,6 +9,7 @@ describe('Model 테스트', () => {
 
   beforeEach(() => {
     store = new Store();
+    store.add = jest.fn();
     model = new Model(store);
   });
 
@@ -25,14 +26,15 @@ describe('Model 테스트', () => {
 
   test('create 메서드가 호출되면 store.add가 새로운 항목을 추가한다', () => {
     const title = 'test1';
-    const newTodo = {
+    // create시 id를 Date.now로 받기 때문에 id를 1로 받게 설정
+    jest.spyOn(Date, 'now').mockReturnValue(1);
+    model.create(title);
+    expect(store.add).toHaveBeenCalledWith({
       title,
       completed: false,
-      id: new Date().getTime(),
-    };
-
-    model.create(title);
-    expect(store.add).toHaveBeenCalledWith(newTodo);
+      id: 1,
+    });
+    jest.restoreAllMocks();
   });
 
   test('delete 메서드가 호출되면 store.delete를 호출한다', () => {

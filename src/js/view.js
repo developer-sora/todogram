@@ -37,45 +37,42 @@ export default class View {
 
   #editItem(id, title) {
     const elem = document.querySelector(`[data-id="${id}"]`);
-    if (!elem) return;
-
-    const div = elem.querySelector('div');
-    div.classList.add('hidden');
-
-    const input = document.createElement('input');
-    input.id = 'edit';
-    input.className = 'w-[97%] border-b outline-none pl-8 pb-1 pt-2 mb-1 mr-2';
-    input.value = title;
-    elem.appendChild(input);
-    input.focus();
+    if (elem) {
+      const div = elem.querySelector('div');
+      div.classList.add('hidden');
+      const input = document.createElement('input');
+      input.id = 'edit';
+      input.className = 'w-[97%] border-b outline-none pl-8 pb-1 pt-2 mb-1 mr-2';
+      input.value = title;
+      elem.appendChild(input);
+      input.focus();
+    }
   }
 
   #openEditMenu(id) {
     const elem = document.querySelector(`[data-id="${id}"]`);
-    if (!elem) {
-      return;
+    if (elem) {
+      const menu = elem.querySelector('ul');
+      menu.classList.remove('hidden');
+      menu.classList.add('opened');
     }
-    const menu = elem.querySelector('ul');
-    menu.classList.remove('hidden');
-    menu.classList.add('opened');
   }
 
   #closeEditMenu() {
     const openedMenu = document.querySelector('.opened');
-    if (!openedMenu) {
-      return;
+    if (openedMenu) {
+      openedMenu.classList.add('hidden');
+      openedMenu.classList.remove('opened');
     }
-    openedMenu.classList.add('hidden');
-    openedMenu.classList.remove('opened');
   }
 
   #editItemDone(id, title) {
     const elem = document.querySelector(`[data-id="${id}"]`);
     if (!elem) return;
-
     elem.querySelector('div').classList.remove('hidden');
     const input = elem.querySelector('#edit');
-    if (input) elem.removeChild(input);
+    if (!input) return;
+    elem.removeChild(input);
     elem.querySelector('label').textContent = title;
   }
 
@@ -178,9 +175,7 @@ export default class View {
         }),
       toggleAll: () =>
         this.$toggleAll.addEventListener('click', e => {
-          if (e.target.id === 'toggle-all') {
-            handler(e.target.checked);
-          }
+          handler(e.target.checked);
         }),
       editItem: () => {
         this.$todoList.addEventListener('dblclick', e => {

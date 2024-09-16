@@ -2,7 +2,6 @@ export default class Controller {
   constructor(model, view) {
     this.model = model;
     this.view = view;
-    // this.view.render('showDate');
     const bindings = {
       turnDarkMode: this.turnDarkMode,
       controlPostButton: this.controlPostButton,

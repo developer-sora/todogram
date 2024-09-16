@@ -18,6 +18,7 @@ class Todo {
   }
 
   initialize() {
+    this.view.render('showDate');
     this.setView();
     window.addEventListener('hashchange', () => this.setView());
     window.addEventListener('load', () => this.setView());

@@ -12,7 +12,7 @@ export default class Template {
     <li data-id="${data.id}" class="px-3 relative">
       <div class="view relative flex">
         <input class="toggle checked:border w-8 border-none appearance-none absolute inset-y-0 cursor-pointer peer/input" type="checkbox" ${
-          data.completed ? 'checked' : ''
+          data.completed ? 'checked ' : ''
         }aria-label="완료하기">
         <label class="list_elem text-sm inline-block pl-10 my-2 mr-4 bg-22 bg-no-repeat 
         transition 

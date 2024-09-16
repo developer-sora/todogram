@@ -26,7 +26,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [{ from: 'static/assets', to: 'assets' }],
     }),
-    new MiniCssExtractPlugin({ filename: 'styles.css', publicPath: './' }),
+    new MiniCssExtractPlugin({ filename: 'styles.css' }),
   ],
   module: {
     rules: [

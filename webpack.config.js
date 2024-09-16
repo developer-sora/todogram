@@ -10,7 +10,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '/',
+    publicPath: './',
     clean: true,
   },
   plugins: [
@@ -21,11 +21,12 @@ module.exports = {
         removeComments: true,
       },
       favicon: 'static/favicon.ico',
+      inject: 'body',
     }),
     new CopyPlugin({
       patterns: [{ from: 'static/assets', to: 'assets' }],
     }),
-    new MiniCssExtractPlugin({ filename: 'styles.css' }),
+    new MiniCssExtractPlugin({ filename: 'styles.css', publicPath: './' }),
   ],
   module: {
     rules: [

@@ -7,6 +7,7 @@ import '../tailwind.css';
 import LocalStorageStorage from './db.js';
 
 class Todo {
+  // test
   constructor() {
     this.db = new LocalStorageStorage('todoList');
     this.storage = new Store('todoList', this.db);

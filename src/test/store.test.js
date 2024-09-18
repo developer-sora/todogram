@@ -62,7 +62,7 @@ describe('Store 클래스 테스트', () => {
     test('add 메서드가 새로운 항목을 추가하고 storage에 저장한다', () => {
       const todos = [{ id: 1, title: 'test1', completed: true }];
       const newTodo = { id: 2, title: 'test2', completed: false };
-      mockStorage.readAll.mockReturnValue([...todos]);
+      mockStorage.readAll.mockReturnValue(todos);
       store.add(newTodo);
       expect(mockStorage.save).toHaveBeenCalledWith(dbName, [...todos, newTodo]);
     });

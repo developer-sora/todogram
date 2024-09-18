@@ -20,8 +20,8 @@ export default class Store {
 
   add(updateData) {
     const todos = this.readAll();
-    todos.push(updateData);
-    this.storage.save(this.dbName, todos);
+    const addedTodos = [...todos, updateData];
+    this.storage.save(this.dbName, addedTodos);
   }
 
   delete(id) {
@@ -47,13 +47,15 @@ export default class Store {
     if (index === -1) {
       return;
     }
-    todos[index] = { ...todos[index], ...updateData };
-    this.storage.save(this.dbName, todos);
+    const updatedTodos = todos.map((todo, i) => {
+      i === index ? { ...todo, ...updateData } : todo;
+    });
+    this.storage.save(this.dbName, updatedTodos);
   }
 
   toggleAll(completed) {
     const todos = this.readAll();
-    todos.forEach(todo => (todo.completed = completed));
-    this.storage.save(this.dbName, todos);
+    const updatedTodos = todos.map(todo => ({ ...todo, completed }));
+    this.storage.save(this.dbName, updatedTodos);
   }
 }

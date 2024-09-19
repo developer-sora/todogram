@@ -3,7 +3,6 @@ name: todogram deploy
 on:
   push:
     branches: [main]
-
   workflow_dispatch:
 
 permissions:
@@ -37,6 +36,7 @@ jobs:
           path: dist
 
   deploy:
+    needs: build-and-test
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

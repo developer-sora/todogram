@@ -48,7 +48,7 @@ export default class Store {
       return;
     }
     const updatedTodos = todos.map((todo, i) => {
-      i === index ? { ...todo, ...updateData } : todo;
+      return i === index ? { ...todo, ...updateData } : todo;
     });
     this.storage.save(this.dbName, updatedTodos);
   }

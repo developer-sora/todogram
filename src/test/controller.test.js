@@ -9,6 +9,7 @@ describe('Controller 테스트', () => {
   let model, view, controller, mockData;
 
   beforeEach(() => {
+    document.location.hash = '#/';
     mockData = [
       { title: 'test1', completed: false, id: 1 },
       { title: 'test2', completed: true, id: 2 },
@@ -103,6 +104,7 @@ describe('Controller 테스트', () => {
 
   describe('addItem 테스트', () => {
     test('할 일 목록 하나를 추가하고 렌더링한다.', () => {
+      controller.setView('');
       controller.addItem('new Item');
       expect(model.create).toHaveBeenCalledWith('new Item');
       expect(view.render).toHaveBeenCalledWith('addItemDone');
@@ -121,6 +123,7 @@ describe('Controller 테스트', () => {
 
   describe('deleteItem 테스트', () => {
     test('할 일 항목에서 항목을 지우고 렌더링한다.', () => {
+      controller.setView('');
       const filterSpy = jest.spyOn(controller, 'filter');
       controller.deleteItem(1);
       expect(model.delete).toHaveBeenCalledWith(1);
@@ -140,6 +143,7 @@ describe('Controller 테스트', () => {
 
   describe('dropItems 테스트', () => {
     test('모든 항목을 삭제하고 전체 삭제 모달을 닫는다.', () => {
+      controller.setView('');
       const filterSpy = jest.spyOn(controller, 'filter');
       controller.dropItems();
       expect(model.drop).toHaveBeenCalledWith(controller.activeRoute);
@@ -150,6 +154,7 @@ describe('Controller 테스트', () => {
 
   describe('toggleItem 테스트', () => {
     test('할 일 항목의 완료 여부를 토글한다.', () => {
+      controller.setView('');
       const filterSpy = jest.spyOn(controller, 'filter');
       controller.toggleItem({
         id: 1,
@@ -166,6 +171,7 @@ describe('Controller 테스트', () => {
 
   describe('toggleAll 테스트', () => {
     test('할 일 항목의 완료 여부를 전부 토글한다.', () => {
+      controller.setView('');
       const filterSpy = jest.spyOn(controller, 'filter');
       controller.toggleAll(true);
       expect(model.toggleAll).toHaveBeenCalledWith(true);
@@ -184,12 +190,14 @@ describe('Controller 테스트', () => {
 
   describe('editItemSave 테스트', () => {
     test('내용이 비어있지 않으면 해당 항목을 업데이트한다.', () => {
+      controller.setView('');
       controller.editItemSave({ id: 1, title: 'update!' });
       expect(model.update).toHaveBeenCalledWith(1, { title: 'update!' });
       expect(view.render).toHaveBeenCalledWith('editItemDone', { id: 1, title: 'update!' });
     });
 
     test('내용이 비어있으면 해당 항목을 지운다.', () => {
+      controller.setView('');
       const deleteSpy = jest.spyOn(controller, 'deleteItem');
       controller.editItemSave({ id: 1, title: '' });
       expect(deleteSpy).toHaveBeenCalledWith(1);

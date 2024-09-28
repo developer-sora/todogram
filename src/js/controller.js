@@ -23,7 +23,7 @@ export default class Controller {
     }
   }
 
-  setView(hash) {
+  setView(hash = '') {
     const route = hash.split('/')[1];
     const page = route || '';
     this.updateFilterState(page);
@@ -130,7 +130,7 @@ export default class Controller {
 
   filter(force) {
     const active = this.activeRoute;
-    const activeRoute = active.charAt(0).toUpperCase() + active.substr(1);
+    const activeRoute = active.charAt(0).toUpperCase() + active.slice(1);
     this.updateCount();
     if (force || this.lastActiveRoute !== 'All' || this.lastActiveRoute !== activeRoute) {
       this[`show${activeRoute}`]();

@@ -1,4 +1,4 @@
-export function findParent(element, tagName) {
+const findParent = (element, tagName) => {
   if (!element.parentNode) {
     return;
   }
@@ -6,4 +6,6 @@ export function findParent(element, tagName) {
     return element.parentNode;
   }
   return findParent(element.parentNode, tagName);
-}
+};
+
+export { findParent };

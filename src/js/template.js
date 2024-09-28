@@ -1,4 +1,21 @@
+'use strict';
+
 import { MODAL_TEXT, NO_DATA_TEXT } from '../constant/textData.js';
+
+const htmlEscapes = {
+  '&': '&amp',
+  '<': '&lt',
+  '>': '&gt',
+  '"': '&quot',
+  "'": '&#x27',
+  '`': '&#x60',
+};
+
+const reUnescapedHtml = /[&<>"'`]/g;
+const reHasUnescapedHtml = new RegExp(reUnescapedHtml.source);
+
+const escapeHtmlChar = chr => htmlEscapes[chr];
+const escape = str => (str && reHasUnescapedHtml.test(str) ? str.replace(reUnescapedHtml, escapeHtmlChar) : str);
 
 export default class Template {
   constructor() {
@@ -14,13 +31,13 @@ export default class Template {
         <input class="toggle checked:border w-8 border-none appearance-none absolute inset-y-0 cursor-pointer peer/input" type="checkbox" ${
           data.completed ? 'checked ' : ''
         }aria-label="완료하기">
-        <label class="list_elem text-sm inline-block pl-10 my-2 mr-4 bg-22 bg-no-repeat 
+        <label class="list_elem w-full text-sm inline-block pl-10 my-2 mr-4 bg-22 bg-no-repeat 
         transition 
         peer-checked/input:bg-heart-fill peer-checked/input:text-gray-300
         peer-checked/input:line-through bg-heart-border bg-left break-all
         peer/text dark:bg-heart-border-white dark:text-slate-100 peer-checked/input:dark:bg-heart-fill-purple peer-checked/input:dark:text-slate-400
         ">
-          ${data.title}
+          ${escape(data.title)}
         </label>
         <button class="editButton m-auto cursor-pointer w-6 h-8 text-2xl absolute right-0 inset-y-0 bg-19 bg-no-repeat bg-center bg-icon-editMenu dark:invert" aria-label="할 일 설정"></button>
       </div>
@@ -60,7 +77,7 @@ export default class Template {
       const status = currentPage.includes('completed') ? 'completed' : 'default';
       return this.noDataTemplate(status);
     }
-    return data.map(this.defaultTemplate).join('');
+    return data.reverse().map(this.defaultTemplate).join('');
   }
 
   showModalTemplate() {

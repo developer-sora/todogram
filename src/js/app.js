@@ -1,3 +1,4 @@
+import 'core-js';
 import Store from './store.js';
 import Model from './model.js';
 import Controller from './controller.js';
@@ -7,9 +8,9 @@ import '../tailwind.css';
 import LocalStorageStorage from './db.js';
 
 class Todo {
-  constructor() {
-    this.db = new LocalStorageStorage('todoList');
-    this.storage = new Store('todoList', this.db);
+  constructor(dbName) {
+    this.db = new LocalStorageStorage();
+    this.storage = new Store(dbName, this.db);
     this.model = new Model(this.storage);
     this.template = new Template();
     this.view = new View(this.template);
@@ -19,14 +20,13 @@ class Todo {
 
   initialize() {
     this.view.render('showDate');
-    this.setView();
-    window.addEventListener('hashchange', () => this.setView());
     window.addEventListener('load', () => this.setView());
+    window.addEventListener('hashchange', () => this.setView());
   }
 
   setView() {
-    this.controller.setView(window.location.hash);
+    this.controller.setView(document.location.hash);
   }
 }
 
-new Todo();
+new Todo('todoList');

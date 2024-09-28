@@ -1,11 +1,12 @@
 {
-  "name": "Todogram",
+  "name": "todogram_sora",
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "webpack serve --mode development",
-    "build": "webpack --mode production",
-    "test": "jest --verbose"
+    "dev": "webpack serve --open --config webpack.dev.js",
+    "build": "webpack server --open --config webpack.prod.js",
+    "test": "jest --verbose",
+    "coverage": "jest --coverage"
   },
   "jest": {
     "testEnvironment": "jest-environment-jsdom"
@@ -35,7 +36,6 @@
     "eslint": "^8.38.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-html": "^7.1.0",
     "eslint-plugin-import": "^2.27.5",
     "html-webpack-plugin": "^5.6.0",
     "jest": "^29.7.0",
@@ -48,7 +48,8 @@
     "terser-webpack-plugin": "^5.3.10",
     "webpack": "^5.79.0",
     "webpack-cli": "^5.0.1",
-    "webpack-dev-server": "^5.1.0"
+    "webpack-dev-server": "^5.1.0",
+    "webpack-merge": "^6.0.1"
   },
   "dependencies": {
     "@babel/polyfill": "^7.12.1"

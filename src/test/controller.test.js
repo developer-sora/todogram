@@ -33,7 +33,7 @@ describe('Controller 테스트', () => {
         'toggleItem',
         'toggleAll',
         'editItem',
-        'openEditMenu',
+        'toggleEditMenu',
         'closeEditMenu',
         'editItemDone',
         'openDropModal',
@@ -48,16 +48,16 @@ describe('Controller 테스트', () => {
   });
 
   describe('setView 테스트', () => {
-    test('locationHash가 있는 경우 updateFilterState메서드가 해당 해시로 실행된다.', () => {
+    test('hash가 있는 경우 updateFilterState메서드가 해당 해시로 실행된다.', () => {
       const updateFilterStateSpy = jest.spyOn(controller, 'updateFilterState');
       controller.setView('#/completed');
       expect(updateFilterStateSpy).toHaveBeenCalledWith('completed');
     });
 
-    test('locationHash가 없는 경우 updateFilterState메서드가 "All"로 실행된다.', () => {
+    test('hash가 없는 경우 updateFilterState메서드가 "All"로 실행된다.', () => {
       const updateFilterStateSpy = jest.spyOn(controller, 'updateFilterState');
       controller.setView();
-      expect(updateFilterStateSpy).toHaveBeenCalledWith(undefined);
+      expect(updateFilterStateSpy).toHaveBeenCalledWith('');
     });
   });
 
@@ -110,10 +110,10 @@ describe('Controller 테스트', () => {
     });
   });
 
-  describe('openEditMenu & closeEditMenu 테스트', () => {
+  describe('toggleEditMenu & closeEditMenu 테스트', () => {
     test('수정/삭제하는 메뉴를 열고 닫을 수 있다.', () => {
-      controller.openEditMenu(1);
-      expect(view.render).toHaveBeenCalledWith('openEditMenu', 1);
+      controller.toggleEditMenu(1);
+      expect(view.render).toHaveBeenCalledWith('toggleEditMenu', 1);
       controller.closeEditMenu();
       expect(view.render).toHaveBeenCalledWith('closeEditMenu');
     });

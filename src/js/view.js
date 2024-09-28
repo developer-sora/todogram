@@ -3,6 +3,7 @@ import { findParent } from '../util/helper.js';
 export default class View {
   constructor(template) {
     this.template = template;
+    this.isEditMenuOpen = false;
     this.$darkMode = document.querySelector('#dark-mode-toggle');
     this.$date = document.querySelector('.date');
     this.$todoList = document.querySelector('#todo-list');
@@ -18,6 +19,11 @@ export default class View {
   #getDate() {
     const now = new Date();
     return `${now.getFullYear()}.${now.getMonth() + 1}.${now.getDate()}`;
+  }
+
+  #setFilter(currentPage) {
+    document.querySelector('.filters .selected').className = '';
+    document.querySelector(`.filters [href="#/${currentPage}"]`).className = 'selected';
   }
 
   #getItemId(element) {
@@ -42,19 +48,28 @@ export default class View {
       div.classList.add('hidden');
       const input = document.createElement('input');
       input.id = 'edit';
-      input.className = 'w-[97%] border-b outline-none pl-8 pb-1 pt-2 mb-1 mr-2';
+      input.className =
+        'w-[97%] text-sm bg-transparent border-b outline-none pl-10 pb-1 pt-2 mb-1 mr-2 dark:text-white';
       input.value = title;
       elem.appendChild(input);
       input.focus();
     }
   }
 
-  #openEditMenu(id) {
-    const elem = document.querySelector(`[data-id="${id}"]`);
-    if (elem) {
-      const menu = elem.querySelector('ul');
-      menu.classList.remove('hidden');
-      menu.classList.add('opened');
+  #toggleEditMenu(id) {
+    if (id) {
+      const elem = document.querySelector(`[data-id="${id}"]`);
+      if (elem) {
+        const menu = elem.querySelector('ul');
+        menu.classList.remove('hidden');
+        menu.classList.add('opened');
+      }
+    } else {
+      const openedMenu = document.querySelector('.opened');
+      if (openedMenu) {
+        openedMenu.classList.add('hidden');
+        openedMenu.classList.remove('opened');
+      }
     }
   }
 
@@ -78,6 +93,7 @@ export default class View {
 
   render(viewCmd, parameter) {
     const viewCommands = {
+      setFilter: () => this.#setFilter(parameter),
       darkMode: () => document.documentElement.classList.toggle('dark'),
       showDate: () => (this.$date.innerHTML = this.#getDate()),
       showEntries: () => {
@@ -93,7 +109,7 @@ export default class View {
         this.$post.classList.add('opacity-30');
       },
       addItemDone: () => (this.$newTodo.value = ''),
-      openEditMenu: () => this.#openEditMenu(parameter),
+      toggleEditMenu: () => this.#toggleEditMenu(parameter),
       closeEditMenu: () => this.#closeEditMenu(),
       openDropModal: () => (this.$modal.innerHTML = this.template.showModalTemplate()),
       closeDropModal: () => (this.$modal.innerHTML = ''),
@@ -128,12 +144,20 @@ export default class View {
         });
         this.$post.addEventListener('click', () => handler(this.$newTodo.value));
       },
-      openEditMenu: () =>
+      toggleEditMenu: () => {
         this.$todoList.addEventListener('click', e => {
           if (e.target.classList.contains('editButton')) {
-            handler(this.#getItemId(e.target));
+            const itemId = this.#getItemId(e.target);
+            if (this.isEditMenuOpen) {
+              this.isEditMenuOpen = false;
+              handler();
+            } else {
+              this.isEditMenuOpen = true;
+              handler(itemId);
+            }
           }
-        }),
+        });
+      },
       closeEditMenu: () => {
         document.addEventListener('click', e => {
           if (!e.target.classList.contains('editButton')) {

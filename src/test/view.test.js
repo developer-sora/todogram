@@ -108,7 +108,7 @@ describe('View 테스트', () => {
 
     test('해당 할 일의 수정(edit) 모드를 열고 닫을 수 있다.', () => {
       // 열기 테스트
-      view.render('openEditMenu', 1);
+      view.render('toggleEditMenu', 1);
       const editMenu = document.querySelector('[data-id="1"] ul');
       expect(editMenu).toHaveClass('opened');
 
@@ -118,7 +118,7 @@ describe('View 테스트', () => {
     });
 
     test('수정 모드를 열 때 주어진 ID를 가진 요소가 없으면 아무 것도 일어나지 않는다.', () => {
-      expect(view.render('openEditMenu', 999));
+      expect(view.render('toggleEditMenu', 999));
     });
 
     test('수정 모드를 닫을 때 수정 모드가 열려있지 않으면 아무 것도 일어나지 않는다.', () => {
@@ -260,17 +260,17 @@ describe('View 테스트', () => {
       expect(handler).toHaveBeenCalledWith('New Todo');
     });
 
-    test('openEditMenu 이벤트가 edit 버튼 클릭 시 호출된다.', () => {
+    test('toggleEditMenu 이벤트가 edit 버튼 클릭 시 호출된다.', () => {
       const handler = jest.fn();
-      view.bind('openEditMenu', handler);
+      view.bind('toggleEditMenu', handler);
 
       fireEvent.click(document.querySelector('[data-id="1"] .editButton'));
       expect(handler).toHaveBeenCalledWith(1);
     });
 
-    test('openEditMenu 이벤트가 edit 버튼이 아닌 다른 부분을 클릭하면 호출되지 않는다', () => {
+    test('toggleEditMenu 이벤트가 edit 버튼이 아닌 다른 부분을 클릭하면 호출되지 않는다', () => {
       const handler = jest.fn();
-      view.bind('openEditMenu', handler);
+      view.bind('toggleEditMenu', handler);
 
       fireEvent.click(document.querySelector('[data-id="1"]'));
       expect(handler).not.toHaveBeenCalled();
@@ -387,10 +387,10 @@ describe('View 테스트', () => {
       expect(handler).toHaveBeenCalledTimes(2);
     });
 
-    test('editItem 이벤트가 할 일 요소의 list_elem 클래스가 아닌 요소를 더블 클릭 혹은 수정 모드의 수정 버튼 이외의 버튼을 클릭하면 호출되지 않는다.', () => {
+    test('editItem 이벤트가 할 일 요소 중 editButton을 더블 클릭 혹은 수정 모드의 수정 버튼 이외의 버튼을 클릭하면 호출되지 않는다.', () => {
       const handler = jest.fn();
       view.bind('editItem', handler);
-      fireEvent.dblClick(document.querySelector('[data-id="1"]'));
+      fireEvent.dblClick(document.querySelector('[data-id="1"] .editButton'));
       fireEvent.click(document.querySelector('[data-id="1"]'));
       expect(handler).not.toHaveBeenCalled();
     });

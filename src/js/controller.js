@@ -10,7 +10,7 @@ export default class Controller {
       toggleItem: this.toggleItem,
       toggleAll: this.toggleAll,
       editItem: this.editItem,
-      openEditMenu: this.openEditMenu,
+      toggleEditMenu: this.toggleEditMenu,
       closeEditMenu: this.closeEditMenu,
       editItemDone: this.editItemSave,
       openDropModal: this.openDropModal,
@@ -23,9 +23,10 @@ export default class Controller {
     }
   }
 
-  setView(locationHash = '') {
-    const route = locationHash.split('/')[1];
-    this.updateFilterState(route);
+  setView(hash) {
+    const route = hash.split('/')[1];
+    const page = route || '';
+    this.updateFilterState(page);
   }
 
   turnDarkMode() {
@@ -58,8 +59,8 @@ export default class Controller {
     this.filter(true);
   }
 
-  openEditMenu(id) {
-    this.view.render('openEditMenu', id);
+  toggleEditMenu(id) {
+    this.view.render('toggleEditMenu', id);
   }
 
   closeEditMenu() {
@@ -128,15 +129,21 @@ export default class Controller {
   }
 
   filter(force) {
+    const active = this.activeRoute;
+    const activeRoute = active.charAt(0).toUpperCase() + active.substr(1);
     this.updateCount();
-    if (force || this.lastActiveRoute !== this.activeRoute) {
-      this[`show${this.activeRoute ?? 'All'}`]();
+    if (force || this.lastActiveRoute !== 'All' || this.lastActiveRoute !== activeRoute) {
+      this[`show${activeRoute}`]();
     }
-    this.lastActiveRoute = this.activeRoute;
+    this.lastActiveRoute = activeRoute;
   }
 
   updateFilterState(currentPage = 'All') {
-    this.activeRoute = currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
+    this.activeRoute = currentPage;
+    if (currentPage === '') {
+      this.activeRoute = 'All';
+    }
     this.filter();
+    this.view.render('setFilter', currentPage);
   }
 }

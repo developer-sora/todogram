@@ -27,11 +27,13 @@
     </header>
     <main
       class="container bg-white max-w-md m-auto min-h-screen pt-4 pb-2 shadow-[0_0px_20px_rgba(0,0,0,0.1)] dark:bg-slate-700">
-      <header class="flex justify-start items-end px-3 mb-2">
-        <a class="font-bold" href="#">
-          <img class="w-6 h-6 absolute dark:invert" src="assets/logo.svg" alt="todogram 로고" />
-          <span class="pl-9 dark:text-white">Todogram</span>
-        </a>
+      <header class="flex justify-start items-end px-3 mb-2 font-bold">
+        <div class="filters">
+          <a class="selected" href="#/">
+            <img class="w-6 h-6 absolute dark:invert" src="assets/logo.svg" alt="todogram 로고" />
+            <span class="pl-9 dark:text-white">Todogram</span>
+          </a>
+        </div>
         <time class="date text-xs dark:text-slate-300 ml-2 text-stone-500"></time>
       </header>
       <video autoplay loop muted playsinline>
@@ -39,14 +41,20 @@
         <source src="assets/03.mp4" type="video/mp4" />
       </video>
       <section class="flex justify-end items-center dark:text-white my-2 mr-4">
-        <a href="#/active" aria-label="해야할 목록만 보기로 이동">
-          <span class="w-6 h-6 ml-1 pl-6 mr-1 bg-heart-border bg-22 bg-no-repeat dark:invert" />
-        </a>
-        <span class="active-count"></span>
-        <a href="#/completed" aria-label="완료된 목록만 보기로 이동">
-          <span class="w-6 h-6 ml-1 pl-6 mr-1 bg-heart-fill bg-22 bg-no-repeat dark:bg-heart-fill-purple" />
-        </a>
-        <span class="completed-count"></span>
+        <ul class="flex filters">
+          <li>
+            <a href="#/active" aria-label="해야할 목록만 보기로 이동">
+              <span class="w-6 h-6 ml-1 pl-6 mr-1 bg-heart-border bg-22 bg-no-repeat dark:invert" />
+            </a>
+            <span class="active-count"></span>
+          </li>
+          <li>
+            <a href="#/completed" aria-label="완료된 목록만 보기로 이동">
+              <span class="w-6 h-6 ml-1 pl-6 mr-1 bg-heart-fill bg-22 bg-no-repeat dark:bg-heart-fill-purple" />
+            </a>
+            <span class="completed-count"></span>
+          </li>
+        </ul>
         <button class="all-destroy" aria-label="모든 항목 삭제">
           <img
             class="dark:invert ml-1"

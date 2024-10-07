@@ -4,7 +4,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "webpack serve --open --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js && next-sitemap",
+    "build": "webpack --config webpack.prod.js",
     "test": "jest --verbose",
     "coverage": "jest --coverage"
   },

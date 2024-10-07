@@ -4,6 +4,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "webpack serve --open --config webpack.dev.js",
+    "postbuild": "next-sitemap",
     "build": "webpack --config webpack.prod.js",
     "test": "jest --verbose",
     "coverage": "jest --coverage"
@@ -52,7 +53,8 @@
     "webpack-merge": "^6.0.1"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.12.1"
+    "@babel/polyfill": "^7.12.1",
+    "next-sitemap": "^4.2.3"
   },
   "description": ""
 }

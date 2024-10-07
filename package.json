@@ -4,8 +4,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "webpack serve --open --config webpack.dev.js",
-    "postbuild": "next-sitemap",
-    "build": "webpack --config webpack.prod.js",
+    "build": "webpack --config webpack.prod.js && next-sitemap",
     "test": "jest --verbose",
     "coverage": "jest --coverage"
   },

@@ -52,8 +52,7 @@
     "webpack-merge": "^6.0.1"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.12.1",
-    "next-sitemap": "^4.2.3"
+    "@babel/polyfill": "^7.12.1"
   },
   "description": ""
 }

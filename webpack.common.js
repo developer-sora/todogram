@@ -21,7 +21,10 @@ module.exports = {
       inject: 'body',
     }),
     new CopyPlugin({
-      patterns: [{ from: 'src/assets', to: 'assets' }],
+      patterns: [
+        { from: 'src/assets', to: 'assets' },
+        { from: 'src/sitemap.xml', to: '' },
+      ],
     }),
   ],
   module: {
